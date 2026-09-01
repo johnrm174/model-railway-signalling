@@ -1,4 +1,5 @@
 #------------------------------------------------------------------------------------
+######################## TO DO - MODULE DOCUMENTATION UPDATES ###########################
 # This module contains all the functions to "run" the layout
 #
 # External API functions intended for use by other editor modules:
@@ -91,213 +92,72 @@
 #------------------------------------------------------------------------------------
 
 import logging
-import time
 from typing import Union
 
 from . import library
 from . import objects
 from . import run_routes
+from . import run_common
 
 #------------------------------------------------------------------------------------
-# The Tkinter Root and Canvas Objects are saved as global variables for easy referencing
-# The automation_enabled and run_mode flags control the behavior of run_layout
+# The spad_popups flags controls whether popup warnings are generated for SPAD events
 #------------------------------------------------------------------------------------
 
-root = None
-canvas = None
-run_mode = None
-automation_enabled = None
-spad_popups = False
-
-enhanced_debugging = True
-
-#------------------------------------------------------------------------------------
-# The initialise function is called at application startup (on canvas creation)
-#------------------------------------------------------------------------------------
-
-def initialise(root_window, canvas_object):
-    global root, canvas
-    root = root_window
-    canvas = canvas_object
-    return()
-
-#------------------------------------------------------------------------------------
-# The behavior of the layout processing will change depending on what mode we are in
-#------------------------------------------------------------------------------------
-
-def configure_edit_mode(edit_mode:bool):
-    global run_mode
-    run_mode = not edit_mode
-    return()
-
-def configure_automation(automation:bool):
-    global automation_enabled
-    automation_enabled = automation
-    return()
+global spad_popups
 
 def configure_spad_popups(popups:bool):
     global spad_popups
     spad_popups = popups
     return()
 
-#------------------------------------------------------------------------------------
-# Internal helper Function to find if an ID is a local (int) or remote (str) Item ID
-#------------------------------------------------------------------------------------
-
-def is_local_id(item_id:Union[int,str]):
-    return( isinstance(item_id, int) or (isinstance(item_id, str) and item_id.isdigit()) )
+# 
+# def find_theoretical_route(object_id, dict_key:str, theoretical_settings:dict):
+#     route, locked = find_route(object_id, dict_key, theoretical_settings)
+#     return(route)
 
 #------------------------------------------------------------------------------------
-# Internal helper Function to find if a signal has a subsidary
-# Note the function should only be called for local signals (sig ID is an integer)
+# Helper function to find the distant signal on the route behind the specified home
+# signal. Will return the Signal ID of the distant signal if one is found (else None).
+# This is used following a signal_updated callback to find any distant signals that may
+# may need to be interlocked with the new state of the signal (if the updated signal
+# was a home signal ahead of the distant signal). Also used following the override of
+# any local signals (case of Distant signals being overridden by home signals ahead)
+# Note that that we stop as soon as we find a signal ID we have already seen to prevent
+# infinite recursion on circular layouts.
 #------------------------------------------------------------------------------------
 
-def has_subsidary(int_signal_id:int):    
-    signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-    return (signal_object["subsidary"][0] or
-            signal_object["sigarms"][0][1][0] or
-            signal_object["sigarms"][1][1][0] or
-            signal_object["sigarms"][2][1][0] or
-            signal_object["sigarms"][3][1][0] or
-            signal_object["sigarms"][4][1][0] )
+def find_distant_signal_behind_home_signal(str_signal_id:str, list_of_signal_ids_already_seen:list=None):
+    if list_of_signal_ids_already_seen is None:
+        list_of_signal_ids_already_seen = []
+    # We could be given a Local or Remote Signal ID here - The local ID will
+    # be in the runtime caches but the remote ID won't
+    if str_signal_id in run_common.signal_str_signal_behind:
+        #Its a local signal - all is straightforward - we use the cached values
+        str_signal_behind_id = run_common.signal_str_signal_behind[str_signal_id]
+        signal_is_home_signal = run_common.signal_is_home_signal[str_signal_ahead_id]
+    else:
+        # Its a remote signal - we have to iterate through all local signals to find a 
+        # match for the signal ahead and assume the remote signal is a home signal
+        str_signal_behind_id = None
+        signal_is_home_signal = True
+        for str_sig_to_test_id, str_sig_ahead_to_match_id in run_common.signal_str_signal_ahead.items():
+            if str_sig_ahead_to_match_id == str_signal_id:
+                str_signal_behind_id = str_sig_to_test_id
+                break
+    # We only care about distant signals behind home signals, so if we find a
+    # non-home signal at any point we bail and return None
+    if str_signal_behind_id is not None:
+        if str_signal_behind_id in list_of_signal_ids_already_seen:
+            str_signal_behind_id = None
+        else:
+            signal_is_dist_signal = run_common.signal_is_dist_signal[str_signal_behind_id]
+            if not signal_is_dist_signal:
+                list_of_signal_ids_already_seen.append(str_signal_behind_id)
+                str_signal_behind_id = find_distant_signal_behind(str_signal_behind_id, list_of_signal_ids_already_seen)
+    return(str_signal_behind_id)
 
 #------------------------------------------------------------------------------------
-# Internal helper Function to find if a signal has a distant arms
-# Note the function should only be called for local signals (sig ID is an integer)
-#------------------------------------------------------------------------------------
-
-def has_distant_arms(int_signal_id:int):    
-    signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-    return (signal_object["sigarms"][0][2][0] or
-            signal_object["sigarms"][1][2][0] or
-            signal_object["sigarms"][2][2][0] or
-            signal_object["sigarms"][3][2][0] or
-            signal_object["sigarms"][4][2][0] )
-
-#------------------------------------------------------------------------------------
-# Internal helper Function to find if a signal is a home signal (semaphore or colour light)
-# Note the function should only be called for local signals (sig ID is an integer)
-#------------------------------------------------------------------------------------
-
-def is_home_signal(int_signal_id:int):
-    signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-    return ( ( signal_object["itemtype"] == library.signal_type.colour_light.value and
-               signal_object["itemsubtype"] == library.signal_subtype.home.value ) or
-             ( signal_object["itemtype"] == library.signal_type.semaphore.value and
-               signal_object["itemsubtype"] == library.semaphore_subtype.home.value) )
-
-#------------------------------------------------------------------------------------
-# Internal helper Function to find if a signal is a distant signal (semaphore or colour light)
-# Note the function should only be called for local signals (sig ID is an integer)
-#------------------------------------------------------------------------------------
-
-def is_distant_signal(int_signal_id:int):
-    signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-    return( ( signal_object["itemtype"] == library.signal_type.colour_light.value and
-              signal_object["itemsubtype"] == library.signal_subtype.distant.value ) or
-            ( signal_object["itemtype"] == library.signal_type.semaphore.value and
-              signal_object["itemsubtype"] == library.signal_subtype.distant.value ) )
-
-#------------------------------------------------------------------------------------
-# Common Function to find the first valid route (all points set correctly) for a Signal or Track Sensor.
-# Most calling functions just use the returned route but the interlocking functions care about the FPLs,
-# so the returned 'locked' flag is used to signify wif the route is fully 'set and locked'.
-#
-# For both signals and track sensors, a route table comprises a list of routes: [MAIN, LH1, LH2, RH1, RH2]
-# For a signal, each route entry comprises: [[p1, p2, p3, p4, p5, p6, p7] signal_id, block_inst_id]
-# For a Track Sensor, each route entry comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
-# Each point element comprises [point_id, point_state]
-#
-# The function also allows routes to be found based on "theoretical point settings" - used by the 
-# schematic route setting functions to 'test' routes to see whether they are viable or not (so the 
-# route button can be either enabled or disabled accordingly). The "theoretical point settings" are 
-# passed in as a variable length dictionary comprising {point_id: point_state,}.
-#------------------------------------------------------------------------------------
-
-def find_route(object_id, dict_key:str, theoretical_settings:dict=None):
-    if theoretical_settings is None: theoretical_settings = {}
-    route_to_return = None
-    # Iterate through each route in the specified table 
-    for index, route_entry in enumerate(objects.schematic_objects[object_id][dict_key]):
-        route_has_points, valid_route, points_locked = False, True, True
-        # Iterate through the points to see if they are set and locked for the route 
-        for point_entry in route_entry[0]:
-            if point_entry[0] > 0:
-                route_has_points = True
-                # This code is for testing a theoretical point setting (if one has been specified)
-                # As it is a theoretical point setting, we have to assume the FPL would be active.
-                if str(point_entry[0]) in theoretical_settings:
-                    if theoretical_settings[str(point_entry[0])] != point_entry[1]:
-                        valid_route = False
-                # If a theoretical point setting has not been specified, we use the real point settings
-                else:
-                    if library.point_switched(point_entry[0]) != point_entry[1]:
-                        valid_route = False
-                    if not library.fpl_active(point_entry[0]):
-                        points_locked = False
-                    if not valid_route: break
-        # Valid route if all points on the route are set and locked correctly
-        # Or if the route is MAIN and no points have been specified for the route
-        if (index == 0 and not route_has_points) or (route_has_points and valid_route):
-            route_to_return = library.route_type(index+1)
-            break
-    return(route_to_return, points_locked)
-
-#------------------------------------------------------------------------------------
-# The following three functions build on the above. The first function just returns the
-# route and is used by most of the Run Layout functions. The second function only returns
-# the route if all FPLs for the route are active. This is used by the interlocking functions.
-# The third function is used by the schematic route setting functions to find a vaild route
-# for a signal, based on the point settings that would exist if the route was activated.
-#------------------------------------------------------------------------------------
-
-def find_valid_route(object_id, dict_key:str):
-    route, locked = find_route(object_id, dict_key)
-    return(route)
-
-def find_locked_route(object_id, dict_key:str):
-    route, locked = find_route(object_id, dict_key)
-    if not locked: route = None
-    return(route)
-
-def find_theoretical_route(object_id, dict_key:str, theoretical_settings:dict):
-    route, locked = find_route(object_id, dict_key, theoretical_settings)
-    return(route)
-
-#------------------------------------------------------------------------------------
-# Internal common Function to find the 'signal ahead' of a signal object (based on
-# the route that has been set (points correctly set and locked for the route)
-# Note the function should only be called for local signals (sig ID is an integer)
-# but can return either local or remote IDs (int or str) - both returned as a str
-# If no route is set or no sig ahead is specified then 'None' is returned
-#------------------------------------------------------------------------------------
-
-def find_signal_ahead(int_signal_id:int):
-    str_signal_ahead_id = None
-    signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
-    if signal_route is not None:
-        signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-        str_signal_ahead_id = signal_object["pointinterlock"][signal_route.value-1][1]
-        if str_signal_ahead_id == "": str_signal_ahead_id = None
-    return(str_signal_ahead_id)
-
-#------------------------------------------------------------------------------------
-# Internal common Function to find the 'signal behind' a signal object by testing each
-# of the other signal objects in turn to find the route that has been set and then see
-# if the 'signal ahead' on the set route matches the signal passed into the function 
-# Note the function can be called for LOCAL or REMOTE signals (sig ID an int or str)
-#------------------------------------------------------------------------------------
-
-def find_signal_behind(int_or_str_signal_id:Union[int,str]):
-    int_signal_behind_id = None
-    for str_signal_id_to_test in objects.signal_index:
-        str_signal_ahead_id = find_signal_ahead(int(str_signal_id_to_test))
-        if str_signal_ahead_id == str(int_or_str_signal_id):
-            int_signal_behind_id = int(str_signal_id_to_test)
-            break
-    return(int_signal_behind_id)
-
-#------------------------------------------------------------------------------------
+######################## TO REVIEW/REFACTOR ##################################
 # Internal Function to walk the route ahead of a distant signal to see if any
 # signals are at DANGER (will return True as soon as this is the case). The 
 # forward search will be aborted as soon as a "non-home" signal type is found
@@ -310,15 +170,19 @@ def find_signal_behind(int_or_str_signal_id:Union[int,str]):
 #------------------------------------------------------------------------------------
 
 def home_signal_ahead_at_danger(int_signal_id:int, recursion_level:int=0):
-    home_signal_at_danger = False
     if recursion_level < 20:
-        str_signal_ahead_id = find_signal_ahead(int_signal_id)
-        if str_signal_ahead_id is not None and is_local_id(str_signal_ahead_id):
+        str_signal_id = str(int_signal_id)
+        str_signal_ahead_id = run_common.signal_str_signal_ahead[str_signal_id]
+        # Check the signal exists - and exists on the local schematic
+        home_signal_at_danger = False
+        if objects.signal_exists(str_signal_ahead_id):
             int_signal_ahead_id = int(str_signal_ahead_id)
-            if ( is_home_signal(int_signal_ahead_id) and
-                 library.signal_state(int_signal_ahead_id) == library.signal_state_type.DANGER):
+            signal_is_home_signal = run_common.signal_is_home_signal[str_signal_ahead_id]
+            signal_has_dist_arms = run_common.signal_has_dist_arms[str_signal_ahead_id]
+            current_signal_state = library.signal_state(int(str_signal_ahead_id))
+            if signal_is_home_signal and current_signal_state == library.signal_state_type.DANGER:
                 home_signal_at_danger = True
-            elif is_home_signal(int_signal_ahead_id) and not has_distant_arms(int_signal_ahead_id):
+            elif signal_is_home_signal and not signal_has_dist_arms:
                 # Call the function recursively to find the next signal ahead
                 home_signal_at_danger = home_signal_ahead_at_danger(int_signal_ahead_id, recursion_level+1)
     else:
@@ -326,8 +190,9 @@ def home_signal_ahead_at_danger(int_signal_id:int, recursion_level:int=0):
     return(home_signal_at_danger)
 
 #------------------------------------------------------------------------------------
-# Internal Function to test if the signal ahead of the specified signal is a
-# distant signal and if that distant signal is displaying a caution aspect.
+######################## TO REVIEW/REFACTOR ##################################
+# Internal Function to test if the signal immediately ahead of the specified signal
+# is a distant signal and if that distant signal is displaying a caution aspect.
 # In the case that the signal ahead is a remote signal we have to assume that
 # the remote signal is in the next block section and should therefore be the
 # distant signal protecting that block section (i.e we don't test the type)
@@ -335,19 +200,24 @@ def home_signal_ahead_at_danger(int_signal_id:int, recursion_level:int=0):
 #------------------------------------------------------------------------------------
 
 def distant_signal_ahead_at_caution(int_signal_id:int):
+    str_signal_id = str(int_signal_id)
+    str_signal_ahead_id = run_common.signal_str_signal_ahead[str_signal_id]
     distant_signal_at_caution = False
-    str_signal_ahead_id = find_signal_ahead(int_signal_id)
+    # Check the signal exists
     if str_signal_ahead_id is not None:
-        if is_local_id(str_signal_ahead_id):
-            int_signal_ahead_id = int(str_signal_ahead_id)
-            if ( is_distant_signal(int_signal_ahead_id) and
-                library.signal_state(int_signal_ahead_id) == library.signal_state_type.CAUTION ):
+        int_signal_ahead_id = int(str_signal_ahead_id)
+        # Check the signal exists on the local schematic
+        if objects.signal_exists(str_signal_ahead_id):
+            signal_is_dist_signal = run_common.signal_is_dist_signal[str_signal_ahead_id]
+            current_signal_state = library.signal_state(int_signal_ahead_id)
+            if signal_is_dist_signal and current_signal_state == library.signal_state_type.CAUTION:
                 distant_signal_at_caution = True
         elif library.signal_state(str_signal_ahead_id) == library.signal_state_type.CAUTION:
             distant_signal_at_caution = True            
-    return (distant_signal_at_caution)
+    return(distant_signal_at_caution)
 
 #------------------------------------------------------------------------------------
+######################## TO REVIEW/REFACTOR ##################################
 # Internal function to find any colour light signals which are configured to update aspects
 # based on the aspect of the signal that has changed (i.e. signals "behind"). The function
 # is recursive and keeps working back along the route until there are no further changes
@@ -357,9 +227,11 @@ def distant_signal_ahead_at_caution(int_signal_id:int):
 
 def update_signal_behind(int_or_str_signal_id:Union[int,str], recursion_level:int=0):
     if recursion_level < 20:
-        int_signal_behind_id = find_signal_behind(int_or_str_signal_id)
-        if int_signal_behind_id is not None:
-            signal_behind_object = objects.schematic_objects[objects.signal(int_signal_behind_id)]
+        str_signal_behind_id = run_common.signal_str_signal_behind[str(int_or_str_signal_id)]
+        # Check the signal exists (if its in the config then it must be local)
+        if str_signal_behind_id is not None: 
+            int_signal_behind_id = int(str_signal_behind_id)
+            signal_behind_object = objects.schematic_objects[objects.signal(str_signal_behind_id)]
             if signal_behind_object["itemtype"] == library.signal_type.colour_light.value:
                 # Fnd the displayed aspect of the signal (before any changes)
                 initial_signal_aspect = library.signal_state(int_signal_behind_id)
@@ -373,6 +245,7 @@ def update_signal_behind(int_or_str_signal_id:Union[int,str], recursion_level:in
     return()
 
 #------------------------------------------------------------------------------------
+######################## TO REVIEW/REFACTOR ##################################
 # Internal function to update a signal aspect based on the displayed aspect of the
 # signal ahead and then to work back along the set route to update any other colour
 # light signals signals need changing. Note that the signal ID could be LOCAL or REMOTE.
@@ -381,59 +254,42 @@ def update_signal_behind(int_or_str_signal_id:Union[int,str], recursion_level:in
 #------------------------------------------------------------------------------------
 
 def process_signal_aspect_update(int_or_str_signal_id:Union[int,str]):
-    # First update on the signal ahead (only if it is a LOCAL colour light signal)
-    # Other local signal types will always display their appropriate aspect
-    # The update signal function works with local and remote signal IDs
-    if is_local_id(int_or_str_signal_id):
-        if int(int_or_str_signal_id) < 1000:
-            signal_object = objects.schematic_objects[objects.signal(int_or_str_signal_id)]
+    # The signal ID passed into this function could either be a local or remote ID
+    # We only update on the signal ahead if it is a LOCAL colour light signal
+    if objects.signal_exists(int_or_str_signal_id):
+        # We know it is a local signal as we used the objects.signal_exists function
+        int_signal_id = int(int_or_str_signal_id)
+        str_signal_id = str(int_or_str_signal_id)
+        if int_signal_id < 1000:
+            # This is a 'normal' signal - NOT a secondary distant
+            signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
             if signal_object["itemtype"] == library.signal_type.colour_light.value:
-                str_signal_ahead_id = find_signal_ahead(int(int_or_str_signal_id))
+                str_signal_ahead_id = run_common.signal_str_signal_ahead[str_signal_id]
                 if str_signal_ahead_id is not None:
                     # Colour Light Signal, with a signal ahead specified
-                    library.update_signal_aspect(int(int_or_str_signal_id), str_signal_ahead_id)
+                    library.update_signal_aspect(int_signal_id, str_signal_ahead_id)
                 else:
                     # Colour light signal with no signal ahead specified
-                    library.update_signal_aspect(int(int_or_str_signal_id))
+                    library.update_signal_aspect(int_signal_id)
             else:
                 # Other signal types (we don't care about the signal ahead)
-                library.update_signal_aspect(int(int_or_str_signal_id))
+                library.update_signal_aspect(int_signal_id)
         else:
             # This must be a secondary distant (with an ID > 1000)
-            library.update_signal_aspect(int(int_or_str_signal_id))
+            library.update_signal_aspect(int_signal_id)
     # Now work back along the route to update signals behind. Note that we do this for
     # all signal types as there could be colour light signals behind this signal
     update_signal_behind(int_or_str_signal_id)
     return()
 
 #------------------------------------------------------------------------------------
-# Function to update the signal route based on the 'interlocking routes' configuration
-# of the signal and the current setting of the points (and FPL) on the schematic
-# Note the function should only be called for local signals (sig ID is an integer)
-#------------------------------------------------------------------------------------
-
-def set_signal_route(int_signal_id:int):
-    signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
-    if signal_route is not None:
-        signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-        # Set the Route (and any associated route indication) for the signal
-        # Note that the main route is the second element (the first element is the dark aspect)
-        theatre_text = signal_object["dcctheatre"][signal_route.value][0]
-        library.set_route(int_signal_id, route=signal_route, theatre_text=theatre_text)
-        # For Semaphore Signals with secondary distant arms we also need
-        # to set the route for the associated semaphore distant signal
-        if has_distant_arms(int_signal_id):
-            int_associated_distant_sig_id = int_signal_id + 1000
-            library.set_route(int_associated_distant_sig_id, route=signal_route)
-    return()
-
-#------------------------------------------------------------------------------------
+######################## TO REVIEW/REFACTOR ##################################
 # Function to trigger any timed signal sequences (from the signal 'passed' event)
 # Note the function should only be called for local signals (sig ID is an integer)
 #------------------------------------------------------------------------------------
 
 def trigger_timed_signal_sequence(int_signal_id:int):
-    signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
+    signal_route = run_common.signal_valid_route_ahead[str(int_signal_id)]
     if signal_route is not None:
         # Get the details of the timed signal sequence to initiate
         # Each route comprises a list of [selected, sig_id,start_delay, time_delay)
@@ -454,6 +310,7 @@ def trigger_timed_signal_sequence(int_signal_id:int):
     return()
 
 #------------------------------------------------------------------------------------
+######################## TO REVIEW/REFACTOR ##################################
 # Function to SET or CLEAR a signal's approach control state and refresh the displayed
 # aspect. The function then recursively calls itself to work backwards along the route
 # updating the approach control state (and displayed aspect)of preceding signals
@@ -464,11 +321,12 @@ def trigger_timed_signal_sequence(int_signal_id:int):
 
 def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_level:int=0):
     if recursion_level < 20:
+        str_signal_id = str(int_signal_id)
         signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
         initial_signal_aspect = library.signal_state(int_signal_id)
         if (signal_object["itemtype"] == library.signal_type.colour_light.value or
                  signal_object["itemtype"] == library.signal_type.semaphore.value):
-            signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
+            signal_route = run_common.signal_valid_route_ahead[str(int_signal_id)]
             if signal_route is not None:
                 # The "approachcontrol" element is a list of routes [Main, Lh1, Lh2, Rh1, Rh2]
                 # Each element represents the approach control mode that has been set
@@ -490,8 +348,9 @@ def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_
             # If the displayed aspect has changed then we also need to work back along the route to update
             # the approach control status of any signals behind (for the semaphore approach control use case)
             if library.signal_state(int_signal_id) != initial_signal_aspect:
-                int_signal_behind_id = find_signal_behind(int_signal_id)
-                if int_signal_behind_id is not None:
+                str_signal_behind_id = run_common.signal_str_signal_behind[str_signal_id]
+                if str_signal_behind_id is not None:
+                    int_signal_behind_id = int(str_signal_behind_id)
                     update_signal_approach_control(int_signal_behind_id, False, recursion_level+1)
         else:
             # Update the displayed signal aspect (Ground Position or Ground Disc signals)
@@ -502,7 +361,6 @@ def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_
 
 #------------------------------------------------------------------------------------
 # Functions to Update track occupancy (from the signal or Track Sensor 'passed' events)
-#
 # For signals, we ignore secondary 'signal passed' events - This is the case of a train passing
 # a signal (and getting passed from one Track Section to another) and then immediately passing an
 # opposing signal on the route ahead (where we don't want to erroneously pass the train back)
@@ -514,6 +372,7 @@ def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_
 list_of_movements = []
 
 #------------------------------------------------------------------------------------
+######################## TO REVIEW/REFACTOR ##################################
 # For both Signals and Track Sensors, we also ignore any events where we can't find a valid route
 # in the signal / Track Sensor configuration to identify the Track Sections either side
 #
@@ -537,21 +396,22 @@ list_of_movements = []
 
 # Signal specific logic for track occupancy updates
 
-def update_track_occupancy_for_signal(item_id:int):
+def update_track_occupancy_for_signal(int_signal_id:int):
     global list_of_movements
-    object_id = objects.signal(item_id)
+    str_signal_id = str(int_signal_id)
+    object_id = objects.signal(int_signal_id)
     schematic_object = objects.schematic_objects[object_id]
-    item_text = "Signal "+str(item_id)
+    item_text = "Signal "+str_signal_id
     # Find the section ahead and section behind the signal (0 = No section). If the returned route is
     # None for a semaphore distant signal then we assume a default route of MAIN. This is to cater for a
     # train passing the semaphore distant where the route (controlling the distant arms) may not be set
     # and locked for the home signal ahead - it is still perfectly valid to pass the distant at caution
     section_behind = schematic_object["tracksections"][0]
-    route = find_valid_route(object_id, "pointinterlock")
-    if route is not None:
-        section_ahead = schematic_object["tracksections"][1][route.value-1][0]
-    elif is_distant_signal(item_id):
-        route = library.route_type.MAIN
+    signal_route = run_common.signal_valid_route_ahead[str_signal_id]
+    if signal_route is not None:
+        section_ahead = schematic_object["tracksections"][1][signal_route.value-1][0]
+    elif run_common.signal_is_dist_signal[str_signal_id]:
+        signal_route = library.route_type.MAIN
         section_ahead = schematic_object["tracksections"][1][0][0]
     else:
         # There is no valid route for the signal so we cannot make any assumptions about the train movement.
@@ -568,7 +428,7 @@ def update_track_occupancy_for_signal(item_id:int):
         else:
             log_text = item_text+" 'passed' - unable to determine movement (no valid route 'ahead of' Signal)"
             logging.warning("RUN LAYOUT: "+log_text)
-            if spad_popups: library.display_warning(canvas, log_text)
+            if spad_popups: library.display_warning(log_text)
     # Establish if this is a primary event or a secondary event (to a previous train movement). This is the
     # case of a train passing a signal/sensor and then immediately passing an opposing signal/sensor ahead.
     # The second event should be ignored as we don't want to pass the train back to the previous section.
@@ -582,49 +442,53 @@ def update_track_occupancy_for_signal(item_id:int):
     # Establish the state of the signal - if the subsidary aspect is clear or the main aspect not showing
     # DANGER then we can assume any movement from the section_behind to the section_ahead is valid.
     # Otherwise we may need to raise a Signal Passed at Danger warning later on in the code
-    if ( (library.signal_state(item_id) != library.signal_state_type.DANGER) or
-         (has_subsidary(item_id) and library.subsidary_state(item_id) != library.signal_state_type.DANGER) ):
+    current_signal_state = library.signal_state(int_signal_id)
+    current_subsidary_state = library.subsidary_state(int_signal_id)
+    signal_has_subsidary = run_common.signal_has_subsidary[str(int_signal_id)]
+    DANGER = library.signal_state_type.DANGER
+    if (current_signal_state != DANGER) or (signal_has_subsidary and current_subsidary_state != DANGER):
         signal_clear = True
     else:
         signal_clear = False
     # Validate the track occupancy change arising from the signal 'passed' event, raising any
     # warnings as required. If there is a change to process, then schedule this for later
-    override_sig = objects.schematic_objects[objects.signal(item_id)]["overridesignal"]
-    override_sub = objects.schematic_objects[objects.signal(item_id)]["overridesubsidary"]
+    override_sig = objects.schematic_objects[objects.signal(int_signal_id)]["overridesignal"]
+    override_sub = objects.schematic_objects[objects.signal(int_signal_id)]["overridesubsidary"]
     # If the route is none we don't process any changes. As long as the route is not none
     # then we can still process the changes (section ahead/behind = 0 is a valid case)
-    if not is_secondary_event and route is not None:
+    if not is_secondary_event and signal_route is not None:
         if validate_occupancy_changes(section_ahead, section_behind, item_text, signal_clear):
             if override_sig:
-                library.set_signal_override(item_id, temp_override=True)
-            if override_sub and has_subsidary(item_id):
-                library.set_subsidary_override(item_id, temp_override=True)
+                library.set_signal_override(int_signal_id, temp_override=True)
+            if override_sub and signal_has_subsidary:
+                library.set_subsidary_override(int_signal_id, temp_override=True)
             clearance_delay = schematic_object["clearancedelay"]*1000
-            root.after(clearance_delay, lambda:process_occupancy_changes(section_ahead, section_behind, item_id))
+            run_common.root.after(clearance_delay, lambda:process_occupancy_changes(section_ahead, section_behind, int_signal_id))
     return()
 
 # Track Sensor specific logic for track occupancy updates
 
-def update_track_occupancy_for_track_sensor(item_id:int):
-    object_id = objects.track_sensor(item_id)
+def update_track_occupancy_for_track_sensor(int_sensor_id:int):
+    str_sensor_id = str(int_sensor_id)
+    object_id = objects.track_sensor(int_sensor_id)
     schematic_object = objects.schematic_objects[object_id]
-    item_text = "Sensor "+str(item_id)
+    item_text = "Sensor "+str_sensor_id
     # Find the section ahead and section behind the Track Sensor (0 = No section). If either of
     # the returned routes are None we can't really assume anything so don't process any changes.
-    route_ahead = find_valid_route(object_id, "routeahead")
+    route_ahead = run_common.sensor_valid_route_ahead[str_sensor_id]
     if route_ahead is None:
         section_ahead = 0
         log_text = item_text+" 'passed' - unable to determine movement (no valid route 'ahead of' Sensor)"
         logging.warning("RUN LAYOUT: "+log_text)
-        if spad_popups: library.display_warning(canvas, log_text)
+        if spad_popups: library.display_warning(log_text)
     else:
         section_ahead = schematic_object["routeahead"][route_ahead.value-1][1]
-    route_behind = find_valid_route(object_id, "routebehind")
+    route_behind = run_common.sensor_valid_route_behind[str_sensor_id]
     if route_behind is None:
         section_behind = 0
         log_text=item_text+" 'passed' - unable to determine movement (no valid route 'behind' Sensor)"
         logging.warning("RUN LAYOUT: "+log_text)
-        if spad_popups: library.display_warning(canvas, log_text)
+        if spad_popups: library.display_warning(log_text)
     else:
         section_behind = schematic_object["routebehind"][route_behind.value-1][1]
     # Establish if this is a primary event or a secondary event (to a previous train movement). This is the
@@ -644,10 +508,11 @@ def update_track_occupancy_for_track_sensor(item_id:int):
     if not is_secondary_event and route_ahead is not None and route_behind is not None:
         if validate_occupancy_changes(section_ahead, section_behind, item_text):
             clearance_delay = schematic_object["clearancedelay"]*1000
-            root.after(clearance_delay, lambda:process_occupancy_changes(section_ahead, section_behind))
+            run_common.root.after(clearance_delay, lambda:process_occupancy_changes(section_ahead, section_behind))
     return()
 
 #------------------------------------------------------------------------------------
+######################## TO REVIEW/REFACTOR ##################################
 # Common function to validate track occupancy changes for either Track Sensor or Signal
 # 'passed' events. This function will return 'True' if there is a track occupancy change
 # to process or 'False if there isn't. It will also raise any warnings as required
@@ -665,25 +530,25 @@ def validate_occupancy_changes(section_ahead:int, section_behind:int, item_text:
         train_descriptor = library.section_label(section_behind)
         log_text = "SPAD alert - "+item_text+" has been Passed at Danger by '"+train_descriptor+"'"
         logging.warning("RUN LAYOUT: "+log_text)
-        if spad_popups: library.display_warning(canvas, log_text)
+        if spad_popups: library.display_warning(log_text)
     elif sig_clear == False and section_ahead > 0 and section_behind == 0 and not library.section_occupied(section_ahead):
         # Section AHEAD = CLEAR - section BEHIND doesn't exist - but signal at danger
         log_text = "SPAD alert - "+item_text+" has been Passed at Danger by an unknown train"
         logging.warning("RUN LAYOUT: "+log_text)
-        if spad_popups: library.display_warning(canvas, log_text)
+        if spad_popups: library.display_warning(log_text)
     elif sig_clear == False and section_behind > 0 and section_ahead == 0 and library.section_occupied(section_behind):
         # Section BEHIND = OCCUPIED - section AHEAD doesn't exist - but signal at danger
         train_descriptor = library.section_label(section_behind)
         log_text = "SPAD alert - "+item_text+" has been Passed at Danger by '"+train_descriptor+"'"
         logging.warning("RUN LAYOUT: "+log_text)
-        if spad_popups: library.display_warning(canvas, log_text)
+        if spad_popups: library.display_warning(log_text)
     elif ( section_ahead > 0 and not library.section_occupied(section_ahead) and
            section_behind > 0 and not library.section_occupied(section_behind) ):
         # Section BEHIND = CLEAR and section AHEAD = CLEAR - No idea
         occupancy_change = False
         log_text = item_text+" 'passed' - unable to determine movement (Sections ahead/behind both CLEAR)"
         logging.warning("RUN LAYOUT: "+log_text)
-        if spad_popups: library.display_warning(canvas, log_text)
+        if spad_popups: library.display_warning(log_text)
     elif ( section_ahead > 0 and library.section_occupied(section_ahead) and
            section_behind > 0 and library.section_occupied(section_behind) ):
         # Section BEHIND = OCCUPIED and section AHEAD = OCCUPIED
@@ -694,16 +559,17 @@ def validate_occupancy_changes(section_ahead:int, section_behind:int, item_text:
             log_text = ( item_text+" 'passed' - "+train_descriptor+"'  has entered Section occupied by '"+
                                         train_ahead_descriptor+"' - Check and update descriptor")
             logging.warning("RUN LAYOUT: "+log_text)
-            if spad_popups: library.display_warning(canvas, log_text)
+            if spad_popups: library.display_warning(log_text)
         else:
             # We have no idea what train has passed the Signal / Track Section
             occupancy_change = False
             log_text = item_text+" 'passed' - unable to determine movement (Sections ahead/behind both OCCUPIED)"
             logging.warning("RUN LAYOUT: "+log_text)
-            if spad_popups: library.display_warning(canvas, log_text)
+            if spad_popups: library.display_warning(log_text)
     return(occupancy_change)
 
 #------------------------------------------------------------------------------------
+######################## TO REVIEW/REFACTOR ##################################
 # Common function to process track occupancy changes arising from either Track Sensor
 # or Signal'passed' events. This function will only get called if there is a valid track
 # occupancy change to process (as previously validated by the function above). If this
@@ -743,177 +609,210 @@ def process_occupancy_changes(section_ahead:int, section_behind:int, sig_id:int=
         # train BEHIND the signal will move into the section AHEAD.
         train_descriptor = library.clear_section_occupied(section_behind)
         library.set_section_occupied (section_ahead, train_descriptor)
-    # Process any other layout changes that could be affected by changes in track occupancy.
-    update_route_highlighting_for_sections()
+    # Clear down the temp override (only set until we process the occupancy change)
     if sig_id > 0:
+        signal_has_subsidary = run_common.signal_has_subsidary[str(sig_id)]
         library.clear_signal_override(sig_id, temp_override=True)
-        if has_subsidary(sig_id): library.clear_subsidary_override(sig_id, temp_override=True)
-    if automation_enabled:
+        if signal_has_subsidary: library.clear_subsidary_override(sig_id, temp_override=True)
+    # Route Highlighting could change (Sections transition between occupied and clear)
+    update_route_highlighting_for_sections()
+     # Displayed signal aspects could change (overridden on section occupied ahead)
+    if run_common.automation_enabled:
         override_signals_based_on_track_sections_ahead()
         update_approach_control_status_for_all_signals()
         override_distant_signals_based_on_signals_ahead()
-    process_all_signal_interlocking()
-    process_all_point_interlocking()
+    # Signal and Point interlocking could change (locked on occupied track sections)
+    # We therefore need to check all signals/points linked to either track section
+    signals1 = section_str_linked_signals[str(section_ahead)]
+    signals2 = section_str_linked_signals[str(section_behind)]
+    points1 = section_str_linked_points[str(section_ahead)]
+    points2 = section_str_linked_points[str(section_behind)]
+    potentially_affected_signals = list(set(signals1+signals2))
+    potentially_affected_points = list(set(points1+points2))
+    process_signal_interlocking(signals_to_update = potentially_affected_signals)
+    process_point_interlocking(points_to_update = potentially_affected_points)
+    # Route viability could changed based on any changes to interlocking
     run_routes.enable_disable_schematic_routes()
     return()
 
 #-------------------------------------------------------------------------------------
-# Function to update the interlocking of each signal against:
+# Function to update the interlocking of specified signals against:
 #   - Point selections (Point and FPL state) - route must be set and locked
 #   - Opposing signals - i.e. signals that clear a conflicting movement
-#   - Block Instruments - Must be switched to LINE CLEAR
+#   - Block Instruments - Must be switched to LINE CLEAR for the route ahead
 #   - Home signals ahead - Distants can be locked against Home signals ahead
 #   - Track Sections ahead (must be UNOCCUPIED) - applied in RUN mode only
 #   - Signals interlocked with their own subsidaries and vice-versa
 #------------------------------------------------------------------------------------
 
-def process_all_signal_interlocking():
-    for str_signal_id in objects.signal_index:
+def process_signal_interlocking(signals_to_update:list[str]):
+    for str_signal_id in signals_to_update:
         int_signal_id = int(str_signal_id)
-        # Note that the ID of any associated distant signal is sig_id+1000
+        # Make a local copy of the run-time cached information we need
+        lever_map = run_common.signal_levers[str_signal_id]
+        int_block_instrument_ahead_id = run_common.signal_int_instrument_ahead[str_signal_id]
+        signal_has_dist_arms = run_common.signal_has_dist_arms[str_signal_id]
+        signal_has_subsidary = run_common.signal_has_subsidary[str_signal_id]
+        signal_route = run_common.signal_locked_route_ahead[str_signal_id]
+        # Retrieve/store the common parameters we need
+        signal_is_clear = library.signal_clear(int_signal_id)
         int_associated_distant_id = int_signal_id + 1000
-        distant_arms_can_be_unlocked, dist_tooltip = has_distant_arms(int_signal_id), "Distant arm is locked because:"
-        signal_can_be_unlocked, sig_tooltip = True, "Signal "+str_signal_id+" is locked because:"
-        subsidary_can_be_unlocked, sub_tooltip = True, "Subsidary "+str_signal_id+" is locked because:"
+        signal_has_subsidary_and_subsidary_is_clear = signal_has_subsidary and library.subsidary_clear(int_signal_id)
+        signal_object = objects.schematic_objects[objects.signal(str_signal_id)]
+        # Reset the interlocking flags and tooltips
+        distant_arms_can_be_unlocked = signal_has_dist_arms
+        signal_can_be_unlocked = True
+        subsidary_can_be_unlocked = True
+        dist_tooltip = "Distant arm is locked because:"
+        sig_tooltip = f"Signal {str_signal_id} is locked because:"
+        sub_tooltip = f"Subsidary {str_signal_id} is locked because:"
         # These are the flags to stop adding new messages to the tooltips (to avoid spam)
         add_to_sig_tt, add_to_sub_tt, add_to_dist_tt = True, True, True
-        # Find the signal route (all points are set and locked by their FPLs)
-        signal_route = find_locked_route(objects.signal(int_signal_id),"pointinterlock")
-        # If there is no set/locked route then the signal/subsidary should be locked
+        # See if the signal has a valid and locked route ahead of it
         if signal_route is None:
-            # Limit the tooltips to display just these messages (further messages irrelevant)
-            sig_tooltip = sig_tooltip + "\nNo set/locked route ahead of signal"
-            sub_tooltip = sub_tooltip + "\nNo set/locked route ahead of signal"
-            signal_can_be_unlocked, add_to_sig_tt  = False, False
+            # No set and locked route ahead - Signal and Subsidary are both locked
+            sig_tooltip += "\nNo set/locked route ahead of signal"
+            sub_tooltip += "\nNo set/locked route ahead of signal"
+            signal_can_be_unlocked, add_to_sig_tt = False, False
             subsidary_can_be_unlocked, add_to_sub_tt = False, False
         else:
-            signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-            # Lock the signal/subsidary if the srt/locked route is not supported by the signal/subsidary
-            # 'sigroutes' and 'subroutes' comprise [main, lh1, lh2, rh1, rh2] where each entry is a boolean
-            # Limit the tooltips to display just these messages (further messages irrelevant)
-            if not signal_object["sigroutes"][signal_route.value-1]:
-                sig_tooltip = sig_tooltip + "\nRoute not supported by signal"
+            # There is a set and locked route ahead
+            route_index = signal_route.value - 1
+            # Lock the signal/subsidary if the set/locked route is not supported by the signal/subsidary
+            # 'sigroutes' and 'subroutes' comprise [MAIN,LH1,LH2,LH3,RH1,RH2,RH3] where each entry is a boolean
+            if not signal_object["sigroutes"][route_index]:
+                sig_tooltip += "\nRoute not supported by signal"
                 signal_can_be_unlocked, add_to_sig_tt = False, False
-            if not signal_object["subroutes"][signal_route.value-1]:
-                sub_tooltip = sub_tooltip + "\nRoute not supported by subsidary"
+            if not signal_object["subroutes"][route_index]:
+                sub_tooltip += "\nRoute not supported by subsidary"
                 subsidary_can_be_unlocked, add_to_sub_tt = False, False
-            # Interlock the main signal with the subsidary (and vice versa)
-            # Limit the tooltips to display just these messages (further messages irrelevant)
-            if library.signal_clear(int_signal_id):
-                if add_to_sub_tt: sub_tooltip = sub_tooltip + "\nMain signal is clear"
+            if signal_is_clear:
+                if add_to_sub_tt:
+                    sub_tooltip += "\nMain signal is clear"
                 subsidary_can_be_unlocked, add_to_sub_tt = False, False
-            if has_subsidary(int_signal_id) and library.subsidary_clear(int_signal_id):
-                if add_to_sig_tt: sig_tooltip = sig_tooltip + "\nSubsidary is clear"
+            if signal_has_subsidary_and_subsidary_is_clear:
+                if add_to_sig_tt:
+                    sig_tooltip += "\nSubsidary is clear"
                 signal_can_be_unlocked, add_to_sig_tt = False, False
-            # Interlock the signal with any opposing signals
-            # 'siginterlock' comprises a list of routes [main, lh1, lh2, rh1, rh2]
-            # Each route element comprises a list of signals [sig1, sig2, sig3, sig4]
-            # Each signal element comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+            # Interlock this signal with any opposing signals defined in the configuration
+            # 'siginterlock' comprises a list of routes [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
+            # Each route element comprises a variable length list of signal elements [sig1, etc]
+            # Each signal element comprises [sig_id, [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]]
             # Where each route element is a boolean value (True or False)
-            signal_route_to_test = signal_object["siginterlock"][signal_route.value-1]
+            signal_route_to_test = signal_object["siginterlock"][route_index]
             for opposing_signal_to_test in signal_route_to_test:
-                int_opposing_signal_id = opposing_signal_to_test[0] 
-                opposing_sig_routes = opposing_signal_to_test[1]
-                for index, opposing_sig_route in enumerate(opposing_sig_routes):
-                    if opposing_sig_route:
-                        if ( library.signal_clear(int_opposing_signal_id, library.route_type(index+1)) or
-                           ( has_subsidary(int_opposing_signal_id) and
-                                library.subsidary_clear(int_opposing_signal_id, library.route_type(index+1)))):
+                int_opp_sig_id = opposing_signal_to_test[0]
+                str_opp_sig_id = str(int_opp_sig_id)
+                opp_sig_routes = opposing_signal_to_test[1]
+                opp_sig_has_sub = run_common.signal_has_subsidary[str_opp_sig_id]
+                for index, opp_sig_route in enumerate(opp_sig_routes):
+                    if opp_sig_route:
+                        route_to_test = library.route_type(index + 1)
+                        opp_sig_cleared_for_route = library.signal_clear(int_opp_sig_id, route_to_test)
+                        opp_sub_cleared_for_route = opp_sig_has_sub and library.subsidary_clear(int_opp_sig_id, route_to_test)
+                        if opp_sig_cleared_for_route or opp_sub_cleared_for_route:
                             subsidary_can_be_unlocked = False
                             signal_can_be_unlocked = False
-                            message = ("\nSignal "+str(opposing_signal_to_test[0])+" is cleared for "+
-                                      str(library.route_type(index+1)).rpartition('.')[-1])
-                            if add_to_sub_tt: sub_tooltip = sub_tooltip + message
-                            if add_to_sig_tt: sig_tooltip = sig_tooltip + message
+                            route_name = str(route_to_test).rpartition('.')[-1]
+                            message = f"\nSignal {int_opp_sig_id} is cleared for {route_name}"
+                            if add_to_sub_tt:
+                                sub_tooltip += message
+                            if add_to_sig_tt:
+                                sig_tooltip += message
             # See if the signal is interlocked with a block instrument on the route ahead
-            # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
-            # The block instrument is the local block instrument - ID is an integer
-            int_block_instrument = signal_object["pointinterlock"][signal_route.value-1][2]
-            if int_block_instrument != 0:
-                block_clear = library.block_section_ahead_clear(int_block_instrument)
-                if not block_clear and not library.signal_clear(signal_object["itemid"]):
+            # If noi block instrument is specified then the value will be None
+            if int_block_instrument_ahead_id:
+                block_clear = library.block_section_ahead_clear(int_block_instrument_ahead_id)
+                if not block_clear and not signal_is_clear:
                     signal_can_be_unlocked = False
-                    if add_to_sig_tt: sig_tooltip = sig_tooltip + ("\nBlock section ahead is not clear")
+                    if add_to_sig_tt:
+                        sig_tooltip += "\nBlock section ahead is not clear"
+            # Interlock the distant signal with any home signals on the route ahead
             # The "interlockedahead" flag will only be True if selected and it can only be selected for
-            # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
-            # In the latter case then a call to "has_distant_arms" will be true (false for all other types)
+            # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms            
             if signal_object["interlockahead"] and home_signal_ahead_at_danger(int_signal_id):
-                if has_distant_arms(int_signal_id):
-                    if not library.signal_clear(signal_object["itemid"]+1000):
-                        # Home semaphore signal with secondary distant arms (distant signal is sig_id + 1000)
-                        if add_to_dist_tt: dist_tooltip = dist_tooltip + "\nHome signals ahead are at danger"
+                if signal_has_dist_arms:
+                    if not library.signal_clear(signal_object["itemid"] + 1000):
+                        if add_to_dist_tt:
+                            dist_tooltip += "\nHome signals ahead are at danger"
                         distant_arms_can_be_unlocked = False
                 elif not library.signal_clear(signal_object["itemid"]):
-                    # Straight forward distant signal (colour light or semaphore)
                     signal_can_be_unlocked = False
-                    if add_to_sig_tt: sig_tooltip = sig_tooltip + "\nHome signals ahead are at danger"
+                    if add_to_sig_tt:
+                        sig_tooltip += "\nHome signals ahead are at danger"
             # Interlock against track sections on the route ahead - note that this is the
             # one bit of interlocking functionality that we can only do in RUN mode as
             # track section objects dont 'exist' as such in EDIT mode
-            if run_mode:
-                interlocked_sections = signal_object["trackinterlock"][signal_route.value-1]
+            if run_common.run_mode:
+                interlocked_sections = signal_object["trackinterlock"][route_index]
                 for section in interlocked_sections:
                     if section > 0 and library.section_occupied(section):
                         signal_can_be_unlocked = False
-                        if add_to_sig_tt: sig_tooltip = sig_tooltip + "\nTrack Section "+str(section)+" is occupied"
-        # Lock/unlock the signal as required - Note if the Signal is OFF we never lock it
-        # as the signalman should always be able to return the signal to Danger
-        if signal_can_be_unlocked or library.signal_clear(int_signal_id): library.unlock_signal(int_signal_id)
-        else: library.lock_signal(int_signal_id, sig_tooltip)
-        # Lock/unlock the subsidary as required (if the signal has one) - Similarly, if the Subsidiary
-        # is OFF we never lock it as the signalman should always be able to return the signal to Danger
-        if has_subsidary(int_signal_id):
-            if subsidary_can_be_unlocked or library.subsidary_clear(int_signal_id): library.unlock_subsidary(int_signal_id)
-            else: library.lock_subsidary(int_signal_id, sub_tooltip)
-        # lock/unlock the associated distant arms (if the signal has any)
-        if has_distant_arms(int_signal_id):
+                        if add_to_sig_tt:
+                            sig_tooltip += f"\nTrack Section {section} is occupied"
+        # Lock/unlock the signal, subsidiary and/or distant arms as required - Note if the Signal is OFF
+        # then we never lock it as the signaller should always be able to return the signal to Danger
+        if signal_can_be_unlocked or signal_is_clear:
+            library.unlock_signal(int_signal_id)
+        else:
+            library.lock_signal(int_signal_id, sig_tooltip)
+        if signal_has_subsidary:
+            if subsidary_can_be_unlocked or library.subsidary_clear(int_signal_id):
+                library.unlock_subsidary(int_signal_id)
+            else:
+                library.lock_subsidary(int_signal_id, sub_tooltip)
+        if signal_has_dist_arms:
             if distant_arms_can_be_unlocked or library.signal_clear(int_associated_distant_id):
                 library.unlock_signal(int_associated_distant_id)
             else:
                 library.lock_signal(int_associated_distant_id, dist_tooltip)
         # lock any Signalbox levers that are linked to the signal
-        for str_lever_id in objects.lever_index:
-            lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
-            if lever_object["linkedsignal"] == int_signal_id:
-                # See if the lever is configured to switch the current signal route - This enables
-                # different levers to switch different signal arms (for diverging routes) If the signal_route
-                # is None then the signal/subsidary/dist will already be locked (with an appropriate tooltip)
-                # We therefore need to check the case of route valid for ths signal but not for the lever
-                if signal_route is not None and not lever_object["signalroutes"][signal_route.value-1]:
-                    lever_valid_for_route = False
-                    if add_to_sig_tt: sig_tooltip = sig_tooltip + "\nSignal route is not set/locked for this lever"
-                    if add_to_sub_tt: sub_tooltip = sub_tooltip + "\nSignal route is not set/locked for this lever"
-                    if add_to_dist_tt: dist_tooltip = dist_tooltip + "\nSignal route is not set/locked for this lever"
-                    add_to_sig_tt, add_to_sub_tt, add_to_dist_tt = False, False, False
+        for str_lever_id, lever_info in lever_map.items():
+            int_lever_id = int(str_lever_id)
+            # See if the lever is configured to switch the current signal route - This enables
+            # different levers to switch different signal arms (for diverging routes) If the signal_route
+            # is None then the signal/subsidary/dist will already be locked (with an appropriate tooltip)
+            # We therefore need to check the case of route valid for ths signal but not for the lever
+            lever_type = lever_info["levertype"]
+            lever_routes = lever_info["signalroutes"]
+            if signal_route is not None and not lever_routes[signal_route.value - 1]:
+                lever_valid_for_route = False
+                if add_to_sig_tt:
+                    sig_tooltip += "\nSignal route is not set/locked for this lever"
+                if add_to_sub_tt:
+                    sub_tooltip += "\nSignal route is not set/locked for this lever"
+                if add_to_dist_tt:
+                    dist_tooltip += "\nSignal route is not set/locked for this lever"
+                add_to_sig_tt, add_to_sub_tt, add_to_dist_tt = False, False, False
+            else:
+                lever_valid_for_route = True
+            if lever_type == "switchsignal":
+                if lever_valid_for_route and signal_can_be_unlocked:
+                    library.unlock_lever(int_lever_id)
                 else:
-                    lever_valid_for_route = True
-                # Lock or unlock the signal lever as appropriate
-                if lever_object["switchsignal"]:
-                    if lever_valid_for_route and signal_can_be_unlocked:
-                        library.unlock_lever(int(str_lever_id))
-                    else:
-                        library.lock_lever(int(str_lever_id), sig_tooltip)
-                elif lever_object["switchsubsidary"]:
-                    if lever_valid_for_route and subsidary_can_be_unlocked:
-                        library.unlock_lever(int(str_lever_id))
-                    else:
-                        library.lock_lever(int(str_lever_id), sub_tooltip)
-                elif lever_object["switchdistant"]:
-                    if lever_valid_for_route and distant_arms_can_be_unlocked:
-                        library.unlock_lever(int(str_lever_id))
-                    else:
-                        library.lock_lever(int(str_lever_id), dist_tooltip)
+                    library.lock_lever(int_lever_id, sig_tooltip)
+            elif lever_type == "switchsubsidary":
+                if lever_valid_for_route and subsidary_can_be_unlocked:
+                    library.unlock_lever(int_lever_id)
+                else:
+                    library.lock_lever(int_lever_id, sub_tooltip)
+            elif lever_type == "switchdistant":
+                if lever_valid_for_route and distant_arms_can_be_unlocked:
+                    library.unlock_lever(int_lever_id)
+                else:
+                    library.lock_lever(int_lever_id, dist_tooltip)
     return()
 
 #------------------------------------------------------------------------------------
-# Function to update the Point interlocking (against signals). Note that this function
-# processes updates for all local points on the schematic
+# Function to update the interlocking of specified points against:
+#   - Signal selections (signal ON/OFF) - point locked when signal OFF
+#   - Track Sections ahead (must be UNOCCUPIED) - applied in RUN mode only
 #------------------------------------------------------------------------------------
 
-def process_all_point_interlocking():
-    for str_point_id in objects.point_index:
+def process_point_interlocking(points_to_update:list[str]):
+    for str_point_id in points_to_update:
         int_point_id = int(str_point_id)
-        point_object = objects.schematic_objects[objects.point(int_point_id)]
+        point_object = objects.schematic_objects[objects.point(str_point_id)]
         point_locked, point_tooltip = False,  "Point "+str_point_id+" is locked because:"
         # siginterlock comprises a variable length list of interlocked signals
         # Each signal entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
@@ -921,12 +820,13 @@ def process_all_point_interlocking():
         for interlocked_signal in point_object["siginterlock"]:
             for index, interlocked_route in enumerate(interlocked_signal[1]):
                 if interlocked_route:
+                    signal_has_subsidary = run_common.signal_has_subsidary[str(interlocked_signal[0])]
                     if library.signal_clear(interlocked_signal[0], library.route_type(index+1)):
                         message = ("\nSignal "+str(interlocked_signal[0])+" is cleared for "+
                                       str(library.route_type(index+1)).rpartition('.')[-1])
                         point_tooltip = point_tooltip + message
                         point_locked = True
-                    if has_subsidary(interlocked_signal[0]) and library.subsidary_clear(interlocked_signal[0], library.route_type(index+1)):
+                    if signal_has_subsidary and library.subsidary_clear(interlocked_signal[0], library.route_type(index+1)):
                         message = ("\nSubsidary "+str(interlocked_signal[0])+" is cleared for "+
                                       str(library.route_type(index+1)).rpartition('.')[-1])
                         point_tooltip = point_tooltip + message
@@ -942,16 +842,23 @@ def process_all_point_interlocking():
         if point_locked: library.lock_point(int_point_id, point_tooltip)
         else: library.unlock_point(int_point_id)
         # Lock any Signalbox levers that are linked to the Point.
-        for str_lever_id in objects.lever_index:
-            lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
-            if lever_object["linkedpoint"] == int_point_id:
-                if (lever_object["switchfpl"] or lever_object["switchpointandfpl"] or
-                     (lever_object["switchpoint"] and not point_object["hasfpl"])):
-                    if point_locked: library.lock_lever(int(str_lever_id), point_tooltip)
-                    else: library.unlock_lever(int(str_lever_id))
+        point_has_fpl = run_common.point_has_fpl[str_point_id]
+        for str_lever_id in run_common.point_levers[str_point_id]:
+            int_lever_id = int(str_lever_id)
+            lever_type = run_common.point_levers[str_point_id][str_lever_id]["levertype"]
+            if point_locked:
+                # If the point is locked - we lock the lever - No questions
+                library.lock_lever(int(str_lever_id), point_tooltip)
+            elif lever_type == "switchpoint" and point_has_fpl and library.fpl_active(int_point_id):
+                # If the point is unlocked, but the lever is for the point only and the FPL is active, the lever remains locked
+                library.lock_lever(int_lever_id, point_tooltip)
+            else:
+                # We're good to unlock the lever
+                library.unlock_lever(int_lever_id)
     return()
 
 #------------------------------------------------------------------------------------
+######################## TO REVIEW/REFACTOR ##################################
 # Function to Set/Clear all signal overrides based on track occupancy (route ahead)
 # Note that this function processes updates for all local signals on the schematic
 #------------------------------------------------------------------------------------
@@ -960,7 +867,9 @@ def override_signals_based_on_track_sections_ahead():
     # Start of main function
     for str_signal_id in objects.signal_index:
         int_signal_id = int(str_signal_id)
-        signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
+        signal_route = run_common.signal_valid_route_ahead[str_signal_id]
+        signal_has_dist_arms = run_common.signal_has_dist_arms[str_signal_id]
+        signal_has_subsidary = run_common.signal_has_subsidary[str_signal_id]
         # Override/clear the current signal based on the section ahead
         override_signal = False
         override_subsidary = False
@@ -974,26 +883,27 @@ def override_signals_based_on_track_sections_ahead():
                     break
             if library.signal_clear(int_signal_id) and override_signal:
                 library.set_signal_override(int_signal_id)
-                if has_distant_arms(int_signal_id):
+                if signal_has_dist_arms:
                     library.set_signal_override(int_signal_id + 1000)
             else:
                 library.clear_signal_override(int_signal_id)
-                if has_distant_arms(int_signal_id):
+                if signal_has_dist_arms:
                     library.clear_signal_override(int_signal_id + 1000)
-            if has_subsidary(int_signal_id):
+            if signal_has_subsidary:
                 if library.subsidary_clear(int_signal_id) and override_subsidary:
                     library.set_subsidary_override(int_signal_id)
                 else:
                     library.clear_subsidary_override(int_signal_id)
         else:
             library.clear_signal_override(int_signal_id)
-            if has_distant_arms(int_signal_id):
+            if signal_has_dist_arms:
                 library.clear_signal_override(int_signal_id + 1000)
-            if has_subsidary(int_signal_id):
+            if signal_has_subsidary:
                 library.clear_subsidary_override(int_signal_id)
     return()
 
 #------------------------------------------------------------------------------------
+######################## TO REVIEW/REFACTOR ##################################
 # Function to override any distant signals that have been configured to be overridden
 # to CAUTION if any of the home signals on the route ahead are at DANGER. If this
 # results in an aspect change then we also work back to update any dependent signals
@@ -1006,7 +916,6 @@ def override_distant_signals_based_on_signals_ahead():
         signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
         # The "overrideahead" flag will only be True if selected and it can only be selected for
         # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
-        # In the latter case then a call to "has_distant_arms" will be true (false for all other types)
         if signal_object["overrideahead"]:
             # The Override on signals ahead function is designed for two use cases
             # 1) Override signal to CAUTION if ANY home signals in the block section are at danger
@@ -1015,15 +924,16 @@ def override_distant_signals_based_on_signals_ahead():
             #    section - e.g. A home signal with an secondary distant arm. In this case the distant
             #    arm would be under the control of the next block section (on that block section schematic)
             #    but you might still want to show the signal (and its state) on your own block schematic
+            signal_has_dist_arms = run_common.signal_has_dist_arms[str_signal_id]
             if distant_signal_ahead_at_caution(int_signal_id) or home_signal_ahead_at_danger(int_signal_id):
-                if has_distant_arms(int_signal_id):
+                if signal_has_dist_arms:
                     library.set_signal_override_caution(int_signal_id+1000)
                     process_signal_aspect_update(int_signal_id+1000)
                 else:
                     library.set_signal_override_caution(int_signal_id)
                     process_signal_aspect_update(int_signal_id)
             else:
-                if has_distant_arms(int_signal_id):
+                if signal_has_dist_arms:
                     library.clear_signal_override_caution(int_signal_id+1000)
                     process_signal_aspect_update(int_signal_id+1000)
                 else:
@@ -1032,124 +942,153 @@ def override_distant_signals_based_on_signals_ahead():
     return()
 
 #------------------------------------------------------------------------------------
+######################## TO REVIEW/REFACTOR ##################################
 # Function to Update the approach control state of all signals (LOCAL signals only).
 # Note that the 'int_or_str_item_id' parameter is passed into this function for SIGNAL
-# SWITCHED events only (the ID is the signal that has been switched. This is to force
+# SWITCHED events only (the ID is the signal that has been switched). This is to force
 # a reset of the approach control status for the signal that has been switched in the
 # period between the signal released and signal passed events. The function is also
 # called for other events including the SIGNAL UPDATED event, hence why this is one
 # of the few run_layout functions that needs to handle both int and str item IDs.
 #------------------------------------------------------------------------------------
 
-def update_approach_control_status_for_all_signals(int_or_str_item_id:Union[int,str]=None):
+def update_approach_control_status_for_all_signals(int_or_str_signal_id:Union[int,str]=None):
     for str_signal_id in objects.signal_index:
-        if str_signal_id == str(int_or_str_item_id): force_set = True
+        int_signal_id = int(str_signal_id)
+        if str_signal_id == str(int_or_str_signal_id): force_set = True
         else: force_set = False
-        update_signal_approach_control(int(str_signal_id), force_set)
+        update_signal_approach_control(int_signal_id, force_set)
     return()
 
 #------------------------------------------------------------------------------------
-# Function to clear all signal overrides and approach control modes (LOCAL signals only)
+# Function to Synchronise any Signalbox Levers associated with a point or signal
+# after a change to the state of a point or signal (note the use of cached data)
 #------------------------------------------------------------------------------------
 
-def clear_all_signal_overrides():
-    for str_signal_id in objects.signal_index:
-        library.clear_signal_override(int(str_signal_id))
-    return()
-
-def clear_all_distant_overrides():
-    for str_signal_id in objects.signal_index:
-        signal_object = objects.schematic_objects[objects.signal(int(str_signal_id))]
-        if signal_object["overrideahead"]:
-            if has_distant_arms(int(str_signal_id)):
-                library.clear_signal_override_caution(int(str_signal_id)+1000)
+def synchronise_levers_with_point(int_point_id:int):
+    str_point_id = str(int_point_id)
+    for str_lever_id in run_common.point_levers[str_point_id]:
+        int_lever_id = int(str_lever_id)
+        lever_type = run_common.point_levers[str_point_id][str_lever_id]["levertype"]
+        # Synchronise the lever position with the point state. The point must be unlocked
+        # (as far as interlocking is concerned) or the point button would have been disabled
+        if lever_type in ("switchpoint", "switchpointandfpl"):
+            current_lever_state = library.lever_switched(int_lever_id)
+            int_lever_id = int(str_lever_id)
+            if current_lever_state != library.point_switched(int_point_id):
+                library.toggle_lever(int_lever_id)
+    
+def synchronise_levers_with_fpl(int_point_id:int):
+    str_point_id = str(int_point_id)
+    current_fpl_state = library.fpl_active(int_point_id)
+    for str_lever_id in run_common.point_levers[str_point_id]:
+        int_lever_id = int(str_lever_id)
+        lever_type = run_common.point_levers[str_point_id][str_lever_id]["levertype"]
+        current_lever_state = library.lever_switched(int_lever_id)
+        # Synchronise the lever position with the point state. The point must be unlocked
+        # (as far as interlocking is concerned) or the point button would have been disabled
+        if lever_type == "switchfpl":
+            if current_lever_state != current_fpl_state:
+                library.toggle_lever(int_lever_id)
+        # Lock the point_only lever if the FPL has been changed to active
+        if lever_type == "switchpoint":
+            if current_fpl_state:
+                library.lock_lever(int_lever_id)
             else:
-                library.clear_signal_override_caution(int(str_signal_id))
+                library.unlock_lever(int_lever_id)
     return()
 
-def clear_all_approach_control():
-    for str_signal_id in objects.signal_index:
-        signal_object = objects.schematic_objects[objects.signal(int(str_signal_id))]
-        if (signal_object["itemtype"] == library.signal_type.colour_light.value or
-                 signal_object["itemtype"] == library.signal_type.semaphore.value):
-            library.clear_approach_control(int(str_signal_id))
+def synchronise_levers_with_signal(int_signal_id:int):
+    str_signal_id = str(int_signal_id)
+    signal_route = run_common.signal_valid_route_ahead[str_signal_id]
+    if signal_route is not None :
+        for str_lever_id in run_common.signal_levers[str_signal_id]:
+            lever_type = run_common.signal_levers[str_signal_id][str_lever_id]["levertype"]
+            lever_routes = run_common.signal_levers[str_signal_id][str_lever_id]["signalroutes"]
+            if lever_type in ("switchsignal", "switchdistant") and lever_routes[signal_route.value-1]: 
+                int_lever_id = int(str_lever_id)
+                current_lever_state = library.lever_switched(int_lever_id)
+                # Synchronise the lever position with the fpl state
+                if current_lever_state != library.signal_clear(int_signal_id):
+                    library.toggle_lever(int_lever_id)
     return()
 
-#------------------------------------------------------------------------------------
-# Function to Process all route updates on the schematic (LOCAL signals only)
-#------------------------------------------------------------------------------------
-
-def configure_all_signal_routes():
-    for str_signal_id in objects.signal_index:
-        set_signal_route(int(str_signal_id))
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to Update all signal aspects (based on signals ahead)
-#------------------------------------------------------------------------------------
-
-def update_all_displayed_signal_aspects():
-    for str_signal_id in objects.signal_index:
-        process_signal_aspect_update(int(str_signal_id))
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to Update all Signalbox Levers (based on the 'new' signal and point states)
-# Called from the signal_switched, point_switched or fpl_switched callback functions
-#------------------------------------------------------------------------------------
-
-def update_all_signalbox_levers():
-    for str_lever_id in objects.lever_index:
-        lever_object = objects.schematic_objects[objects.lever(str_lever_id)]
-        lever_switched = library.lever_switched(int(str_lever_id))
-        linked_signal = lever_object["linkedsignal"]
-        linked_point = lever_object["linkedpoint"]
-        if linked_signal > 0:
-            # We always check if the point has a subsidary or associated distant to cover the case of a
-            # signal configuration being changed (to remove these) after the lever was configured.
-            subsidary = has_subsidary(linked_signal)
-            dist_arms = has_distant_arms(linked_signal)
-            # Find the current 'route' for the signal and see if the lever is configured to switch
-            # the current signal route - This allows different levers to switch different signal arms
-            signal_route = find_valid_route(objects.signal(linked_signal),"pointinterlock")
-            if signal_route is not None and lever_object["signalroutes"][signal_route.value-1]:
-                lever_valid_for_route = True
-            else:
-                lever_valid_for_route = False
-            # Switch the lever according to the state of the signal
-            if (lever_object["switchsignal"] and lever_valid_for_route and
-                                    lever_switched != library.signal_clear(linked_signal)):
-                library.toggle_lever(int(str_lever_id))
-            elif (lever_object["switchsubsidary"] and subsidary and lever_valid_for_route and
-                                    lever_switched != library.subsidary_clear(linked_signal)):
-                library.toggle_lever(int(str_lever_id))
-            elif (lever_object["switchdistant"] and dist_arms and lever_valid_for_route and
-                                    lever_switched != library.signal_clear(linked_signal + 1000)):
-                library.toggle_lever(int(str_lever_id))
-        elif linked_point > 0:
-            # We always check if the point has a FPL (before switching the FPL) to cover the case of a
-            # point configuration being changed (to no FPL) after the lever was configured.
-            has_fpl = objects.schematic_objects[objects.point(linked_point)]["hasfpl"]
-            if lever_object["switchpoint"] and lever_switched != library.point_switched(linked_point):
-                library.toggle_lever(int(str_lever_id))
-            elif lever_object["switchpointandfpl"] and lever_switched != library.point_switched(linked_point):
-                library.toggle_lever(int(str_lever_id))
-            elif lever_object["switchfpl"] and has_fpl:
-                if lever_switched != library.fpl_active(linked_point):
-                    library.toggle_lever(int(str_lever_id))
-                # If we have a lever connected only to the FPL of a point then we need to find the
-                # associated lever (connected to the point switch) and lock/unlock it as required
-                # according to the state of the point interlocking and the state of the FPL
-                for str_other_lever_id in objects.lever_index:
-                    other_lever_object = objects.schematic_objects[objects.lever(str_other_lever_id)]
-                    if other_lever_object["linkedpoint"] == linked_point and other_lever_object["switchpoint"]:
-                        if library.fpl_active(linked_point) or library.point_locked(linked_point):
-                            library.lock_lever(int(str_other_lever_id), "FPL is active")
-                        else:
-                            library.unlock_lever(int(str_other_lever_id))
+def synchronise_levers_with_subsidary(int_signal_id:int):
+    str_signal_id = str(int_signal_id)
+    signal_route = run_common.signal_valid_route_ahead[str_signal_id]
+    if signal_route is not None :
+        for str_lever_id in run_common.signal_levers[str_signal_id]:
+            lever_type = run_common.signal_levers[str_signal_id][str_lever_id]["levertype"]
+            lever_routes = run_common.signal_levers[str_signal_id][str_lever_id]["signalroutes"]
+            if lever_type == "switchsubsidary" and lever_routes[signal_route.value-1]: 
+                int_lever_id = int(str_lever_id)
+                current_lever_state = library.lever_switched(int_lever_id)
+                # Synchronise the lever position with the fpl state
+                if current_lever_state != library.subsidary_clear(int_signal_id):
+                    library.toggle_lever(int_lever_id)
     return()
 
 #------------------------------------------------------------------------------------
+# Function to process any signalbox lever state changes, by invoking the appropriate
+# signal/point callbacks. Thee locking state should always mirror the locking state of
+# the associated point/signal so we don't need to check this before making the callback
+#------------------------------------------------------------------------------------
+
+def process_lever_change(int_lever_id:int):
+    lever_object = objects.schematic_objects[objects.lever(int_lever_id)]
+    lever_switched = library.lever_switched(int_lever_id)
+    int_linked_signal_id = lever_object["linkedsignal"]
+    str_linked_signal_id = str(int_linked_signal_id)
+    int_linked_point_id = lever_object["linkedpoint"]
+    str_linked_point_id = str(int_linked_point_id)
+    # Update the associated signal or point to reflect the state of the lever
+    if int_linked_signal_id > 0:
+        # Change the signal as required and call the signal_switched_callback to process any changes.
+        # We always check if the point has a subsidary or associated distant to cover the case of a
+        # signal configuration being changed (to remove these) after the lever was configured.
+        subsidary = run_common.signal_has_subsidary[str_linked_signal_id]
+        dist_arms = run_common.signal_has_dist_arms[str_linked_signal_id]
+        # Find the current 'route' for the signal and see if the lever is configured to switch
+        # the current signal route - This allows different levers to switch different signal arms
+        signal_route = run_common.signal_valid_route_ahead[str_linked_signal_id]
+        if signal_route is not None and lever_object["signalroutes"][signal_route.value-1]:
+            lever_valid_for_route = True
+        else:
+            lever_valid_for_route = False
+        # Switch the signal, subsidary and/or distant arm as required
+        if lever_object["switchsignal"] and lever_valid_for_route and lever_switched != library.signal_clear(int_linked_signal_id):
+            library.toggle_signal(int_linked_signal_id)
+            run_common.signal_switched_callback(int_linked_signal_id)
+        elif (lever_object["switchsubsidary"] and subsidary and lever_valid_for_route and
+                            lever_switched != library.subsidary_clear(int_linked_signal_id)):
+            library.toggle_subsidary(int_linked_signal_id)
+            run_common.subsidary_switched_callback(int_linked_signal_id)
+        elif (lever_object["switchdistant"] and dist_arms and lever_valid_for_route and
+                            lever_switched != library.signal_clear(int_linked_signal_id + 1000)):
+            library.toggle_signal(int_linked_signal_id + 1000)
+            run_common.signal_switched_callback(int_linked_signal_id)
+    elif int_linked_point_id > 0:
+        # Change the point as required and call the point_switched_callback to process any changes.
+        # We always check if the point has a FPL (before switching the FPL) to cover the case of a
+        # point configuration being changed (to no FPL) after the lever was configured.
+        has_fpl = run_common.point_has_fpl[str_linked_point_id]
+        if lever_object["switchpointandfpl"] and lever_switched != library.point_switched(int_linked_point_id):
+            if has_fpl and library.fpl_active(int_linked_point_id):
+                library.toggle_fpl(int_linked_point_id)
+            library.toggle_point(int_linked_point_id)
+            if has_fpl and not library.fpl_active(int_linked_point_id):
+                library.toggle_fpl(int_linked_point_id)
+            run_common.point_switched_callback(int_linked_point_id)
+        elif lever_object["switchpoint"] and lever_switched != library.point_switched(int_linked_point_id):
+            library.toggle_point(int_linked_point_id)
+            run_common.point_switched_callback(int_linked_point_id)
+        elif lever_object["switchfpl"] and has_fpl and lever_switched != library.fpl_active(int_linked_point_id):
+            library.toggle_fpl(int_linked_point_id)
+            run_common.fpl_switched_callback(int_linked_point_id)    
+    return()    
+
+#------------------------------------------------------------------------------------
+######################## TO REVIEW/REFACTOR ##################################
 # Function to Update the route highlighting to show sections OCCUPIED. Called from all
 # callback functions that could result in an update to the state of Track Sections
 # (signal_passed, sensor_passed, section_updated). Also called from initialise_layout.
@@ -1164,7 +1103,7 @@ def update_route_highlighting_for_sections():
     for section_id in objects.section_index:
         # If we are in Edit mode then we want to clear down all route highlighting
         # Otherwise we set/clear the colour overrides based on the state of the track section
-        if library.section_occupied(int(section_id)) and run_mode:
+        if library.section_occupied(int(section_id)) and run_common.run_mode:
             colour_to_set = objects.schematic_objects[objects.section(section_id)]["highlightcolour"]
             for line_id in objects.schematic_objects[objects.section(section_id)]["linestohighlight"]:
                 library.set_line_colour_override(int(line_id),colour_to_set)
@@ -1184,355 +1123,51 @@ def update_route_highlighting_for_sections():
                     library.reset_point_colour_override(int(point_id))
     return()
 
-##################################################################################################
-# Function to "initialise" the layout - Called on change of Edit/Run Mode, Automation
-# Enable/Disable, layout reset, layout load, object deletion (from the schematic) or
-# the configuration change of any schematic object
-##################################################################################################
+#------------------------------------------------------------------------------------
+# Functions called on layout initialisation to reset the signal states
+#------------------------------------------------------------------------------------
 
-def initialise_layout():
-    global list_of_movements
-    # Reset the list of track occupancy movements
-    list_of_movements = []
-    # We always process signal routes - for all modes whether automation is enabled/disabled
-    configure_all_signal_routes()
-    if run_mode and automation_enabled:
-        # Run Mode (Track Sections exist) with Automation Enabled. Note that aspects are updated by
-        #  update_approach_control_status_for_all_signals and override_distant_signals_based_on_signals_ahead
-        override_signals_based_on_track_sections_ahead()
-        update_approach_control_status_for_all_signals()
-        override_distant_signals_based_on_signals_ahead()        
-    else:
-        # Automation is disabled (either de-selected in RUN mode or we are in EDIT mode)
-        # Note that we need to call the update_all_displayed_signal_aspects function (see above)
-        # as we are not calling the other functions that would do this for us
-        clear_all_signal_overrides()
-        clear_all_distant_overrides()
-        clear_all_approach_control()
-        update_all_displayed_signal_aspects()
-    # We always process interlocking - for all modes whether automation is enabled/disabled
-    process_all_signal_interlocking()
-    process_all_point_interlocking()
-    # In EDIT mode all schematic routes are cleared down, unhighlighted and all route buttons disabled
-    # In RUN mode, any schematic routes that are still selected are highlighted (layout load use case)
-    run_routes.enable_disable_schematic_routes()
-    run_routes.initialise_all_schematic_routes()
-    # Update all signalbox levers to reflect the current state of points and signals
-    update_all_signalbox_levers()
-    # Update any route highlighting (to show track sections occupied)
-    update_route_highlighting_for_sections()
-    # Refocus back on the canvas to ensure that any keypress events function
-    canvas.focus_set()
+def clear_all_signal_overrides():
+    for str_signal_id in objects.signal_index:
+        int_signal_id = int(str_signal_id)
+        library.clear_signal_override(int_signal_id)
     return()
 
-##################################################################################################
-# Function to "reset" the layout - Called on Layout Reset (Mode menubar dropdown)
-# This function sets all Signals, Points and DCC switches back to their default states:
-# (Signals/subsidaries ON, Points UNSWITCHED with FPL ACTIVE and DCC SWITCHES OFF).
-# It also clears down all active Routes - this will happen for most of the Routes when they
-# are invalidated by the Points, Signals and DCC Switches being changed back to their default
-# states, but we also clear down any remaining routes at the end (e.g. a route definition
-# that does not contain any signals, points or switches - just route highlighting)
-# Note we leave Track Sections unchanged - so the layout doesn't lose the current state
-##################################################################################################
-
-def reset_layout(switch_delay:int=0):
-    # Block Instruments don't send out any DCC commands so we can clear them down straight away without a delay
-    for instrument_id in objects.instrument_index:
-        library.set_instrument_blocked(int(instrument_id))
-    # Everything else needs to be scheduled with the specified delay so for large layouts with lots
-    # of points, signals and DCC accessories we don't overload the bus by changing everything at once.
-    delay = run_routes.schedule_tasks_to_reset_signals(objects.signal_index, switch_delay, route_button_id=0, delay=0)
-    delay = run_routes.schedule_tasks_to_reset_subsidaries(objects.signal_index, switch_delay, route_button_id=0, delay=delay)
-    delay = run_routes.schedule_tasks_to_reset_points(objects.point_index, switch_delay, route_button_id=0, delay=delay)
-    delay = run_routes.schedule_tasks_to_reset_switches(objects.switch_index, switch_delay, route_button_id=0, delay=delay)
-    # Finally, we schedule the task to clear down any routes that do not get automatically cleared down
-    # as they are invalidated by the reset of the points, signals and switches in the route configuration
-    delay = run_routes.schedule_tasks_to_reset_remaining_routes(switch_delay, delay=delay)
-    return(delay)
-
-##################################################################################################
-# These are the run-layout callbacks (set up when creating the library objects on the schematic)
-# Note that the returned item_id could be a remote ID (str) or local_id (int) for SIGNAL UPDATED
-# events. All other events are local_ids (int) - associated with objects on the local schematic
-# The point_switched, fpl_switched, signal_switched and subsidary_switched functions are also
-# called following changes to the layout initiated by the schematic_routes function. In this
-# case, the route_id is also passed into the function so it can be forwarded to the functions
-# that check if routes are still valid following a change in state. This is so any changes to
-# set up or clear down a route won't trigger a route re-set - eg set FPL off to change a point
-##################################################################################################
-
-##################################################################################################
-# A note on tech debt to address at some stage going forward:
-#
-# At the moment, if we are in Run Mode with Automation On, the displayed aspect of the signal could
-# be influenced by changes to track occupancy (overridden on sections ahead occupied), its approach
-# control state (release on Red or Release on Yellow) and, for distant signals only, whether the
-# signal is overridden on the state of all home signals ahead.
-#
-# The code tries to avoid multiple changes to the displayed aspect of the signal (and dcc commands
-# being sent out until all this processing is complete - otherwise you might get instances of a
-# semaphore being 'cleared' as soon as the button is clicked, only to be then set back to ON once
-# we have established it is subject to approach control.The signals library therefore only updates
-# the signal when the 'update_signal_aspect' function is called (not on the initial button press)
-#
-# Its therefore up to this run_layout code to decide when to update the signal, but the problem
-# is that a change to the displayed aspect of one signal may result in the need to updated the
-# displayed aspect of any signals behind. As any depending on the changed state of other signals
-# (e.g. When setting approach control, the signal aspect may change and if it does, then the
-# displayed aspect of signals behind will also need to change. The processing sequence is:
-#
-#    Initial event - Will give us the initial (least restrictive) aspect
-#    trigger_timed_signal_sequence(signal_id) - aspect could be more restrictive
-#    override_signals_based_on_track_sections_ahead() - aspect could be more restrictive
-#    update_approach_control_status_for_all_signals(signal_id) - aspect could be more restrictive
-#         #### This is the point we update the signal aspect (and then update the signals behind)
-#         #### Will depend on: Sig ON/OFF, overrides, Timed Sequence, approach control
-#    override_distant_signals_based_on_signals_ahead()
-#         #### Once the aspect of all signals has been updated, we need to make a second pass
-#         #### To update any distants that have a Home signal showing danger on the route ahead
-#
-# Ideally, we want to do all the processing to set the INTENDED aspect of each signal, looping
-# Through as many times as we need to - to update the INTENDED aspect based on the INTENDED
-# aspect of other signals - And then set the DISPLAYED aspect to the INTENDED aspect once 
-##################################################################################################
-
-def point_switched_callback(point_id:int, route_id:int=0):
-    if enhanced_debugging:
-        logging.debug("############################## point_switched_callback "+str(point_id))
-        start_time = time.time()
-    configure_all_signal_routes()
-    process_all_signal_interlocking()
-    run_routes.check_routes_valid_after_point_change(point_id, route_id)
-    update_all_signalbox_levers()
-    if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
+def clear_all_distant_overrides():
+    for str_signal_id in objects.signal_index:
+        int_signal_id = int(str_signal_id)
+        signal_object = objects.schematic_objects[objects.signal(str_signal_id)]
+        if signal_object["overrideahead"]:
+            if run_common.signal_has_dist_arms[str_signal_id]:
+                library.clear_signal_override_caution(int_signal_id+1000)
+            else:
+                library.clear_signal_override_caution(int_signal_id)
     return()
 
-def fpl_switched_callback(point_id:int, route_id:int=0):
-    if enhanced_debugging:
-        logging.debug("############################## fpl_switched_callback "+str(point_id))
-        start_time = time.time()
-    process_all_signal_interlocking()
-    run_routes.check_routes_valid_after_point_change(point_id, route_id)
-    update_all_signalbox_levers()
-    if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
+def clear_all_approach_control():
+    for str_signal_id in objects.signal_index:
+        int_signal_id = int(str_signal_id)
+        signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
+        if (signal_object["itemtype"] == library.signal_type.colour_light.value or
+                 signal_object["itemtype"] == library.signal_type.semaphore.value):
+            library.clear_approach_control(int_signal_id)
     return()
 
-def signal_updated_callback(signal_id:Union[int,str]):
-    if enhanced_debugging:
-        logging.debug("############################## signal_updated_callback "+str(signal_id))
-        start_time = time.time()
-    if run_mode and automation_enabled:
-        update_approach_control_status_for_all_signals()
-        override_distant_signals_based_on_signals_ahead()
-    else:
-        process_signal_aspect_update(signal_id)
-    process_all_signal_interlocking()
-    run_routes.enable_disable_schematic_routes()
-    if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
+def update_all_displayed_signal_aspects():
+    for str_signal_id in objects.signal_index:
+        int_signal_id = int(str_signal_id)
+        process_signal_aspect_update(int_signal_id)
     return()
 
-def signal_switched_callback(signal_id:int, route_id:int=0):
-    start_time = time.time()
-    if enhanced_debugging:
-        logging.debug("############################## signal_switched_callback "+str(signal_id))
-        start_time = time.time()
-    if run_mode and automation_enabled:
-        override_signals_based_on_track_sections_ahead()
-        update_approach_control_status_for_all_signals(signal_id)    
-        override_distant_signals_based_on_signals_ahead()
-    else:
-        process_signal_aspect_update(signal_id)
-    process_all_signal_interlocking()
-    process_all_point_interlocking()
-    run_routes.check_routes_valid_after_signal_change(signal_id, route_id)
-    run_routes.enable_disable_schematic_routes()
-    update_all_signalbox_levers()
-    if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
-    return()
-
-def subsidary_switched_callback(signal_id:int, route_id:int=0):
-    if enhanced_debugging:
-        logging.debug("############################## subsidary_switched_callback "+str(signal_id))
-        start_time = time.time()
-    if run_mode and automation_enabled:
-        override_signals_based_on_track_sections_ahead()
-    process_all_signal_interlocking()
-    process_all_point_interlocking()
-    run_routes.check_routes_valid_after_subsidary_change(signal_id, route_id)
-    run_routes.enable_disable_schematic_routes()
-    update_all_signalbox_levers()
-    if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
-    return()
-
-# Release 5.4.0 introduces the concept of a 'clearance delay' after signal passed and
-# sensor passed events before the train is passed from one track section to the next.
-# The update_track_occupancy_for_signal function now works out what the track occupancy
-# changes will be and schedules the actual update for after the clearance delay.
-# During this period the signal is overridden to DANGER.
-def signal_passed_callback(signal_id:int):
-    if enhanced_debugging:
-        logging.debug("############################## signal_passed_callback "+str(signal_id))
-        start_time = time.time()
-    # Work out what the track occupancy changes will be and schedule an event to update them.
-    # Any timed signal sequences are triggered immediately after the signal is passed
-    if run_mode: update_track_occupancy_for_signal(signal_id)
-    # Even though schematic updates resulting from track occupancy changes are scheduled
-    # for the future, this callback could also represent the start of a timed signal
-    # sequence. We therefore need to trigger this and then process any other layout
-    # changes that could be affected by a change to a signal aspect
-    if run_mode and automation_enabled:
-        trigger_timed_signal_sequence(signal_id)
-        update_approach_control_status_for_all_signals()
-        override_distant_signals_based_on_signals_ahead()
-    else:
-        process_signal_aspect_update(signal_id)
-    # Reset any routes on signal passed events
-    run_routes.trigger_routes_after_signal_passed(signal_id)
-    run_routes.enable_disable_schematic_routes()
-    if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
-    return()
-
-def signal_released_callback(signal_id:int):
-    if enhanced_debugging:
-        logging.debug("############################## signal_released_callback "+str(signal_id))
-        start_time = time.time()
-    if run_mode and automation_enabled:
-        update_approach_control_status_for_all_signals()    
-        override_distant_signals_based_on_signals_ahead()
-    else:
-        process_signal_aspect_update(signal_id)
-    process_all_signal_interlocking()
-    run_routes.enable_disable_schematic_routes()
-    if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
-    return()
-
-# Release 5.4.0 introduces the concept of a 'clearance delay' after signal passed and
-# sensor passed events before the train is passed from one track section to the next.
-# The update_track_occupancy_for_signal function now works out what the track occupancy
-# changes will be and schedules the actual update for after the clearance delay.
-def sensor_passed_callback(sensor_id:int):
-    if enhanced_debugging:
-        logging.debug("############################## sensor_passed_callback "+str(sensor_id))
-        start_time = time.time()
-    # Work out what the track occupancy changes will be and schedule an event to update them.
-    # Any timed signal sequences are triggered immediately after the signal is passed
-    if run_mode: update_track_occupancy_for_track_sensor(sensor_id)
-    run_routes.trigger_routes_after_sensor_passed(sensor_id)
-    run_routes.enable_disable_schematic_routes()
-    if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
-    return()
-        
-def section_updated_callback(section_id:int):
-    if enhanced_debugging:
-        logging.debug("############################## section_updated_callback "+str(section_id))
-        start_time = time.time()
-    if run_mode:
-        update_route_highlighting_for_sections()
-        if automation_enabled:
-            override_signals_based_on_track_sections_ahead()
-            update_approach_control_status_for_all_signals()
-            override_distant_signals_based_on_signals_ahead()
-    process_all_signal_interlocking()
-    process_all_point_interlocking()
-    run_routes.enable_disable_schematic_routes()
-    if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
-    return()
-
-def instrument_updated_callback(instrument_id:int):
-    if enhanced_debugging:
-        logging.debug("############################## instrument_updated_callback "+str(instrument_id))
-        start_time = time.time()
-    process_all_signal_interlocking()
-    run_routes.enable_disable_schematic_routes()
-    if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
-    return()
-
-def switch_updated_callback(switch_id:int, route_id:int=0):
-    if enhanced_debugging:
-        logging.debug("############################## switch_updated_callback "+str(switch_id))
-        start_time = time.time()
-    run_routes.check_routes_valid_after_switch_change(switch_id,route_id)
-    if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
-    return()
-
-def lever_switched_callback(lever_id:int):
-    if enhanced_debugging:
-        logging.debug("############################## lever_switched_callback "+str(lever_id))
-        start_time = time.time()
-    lever_object = objects.schematic_objects[objects.lever(lever_id)]
-    lever_switched = library.lever_switched(lever_id)
-    linked_signal = lever_object["linkedsignal"]
-    linked_point = lever_object["linkedpoint"]
-    # Update the associated signal or point to reflect the state of the lever
-    if linked_signal > 0:
-        # Change the signal as required and call the signal_switched_callback to process any changes.
-        # We always check if the point has a subsidary or associated distant to cover the case of a
-        # signal configuration being changed (to remove these) after the lever was configured.
-        subsidary = has_subsidary(linked_signal)
-        dist_arms = has_distant_arms(linked_signal)
-        # Find the current 'route' for the signal and see if the lever is configured to switch
-        # the current signal route - This allows different levers to switch different signal arms
-        signal_route = find_valid_route(objects.signal(linked_signal),"pointinterlock")
-        if signal_route is not None and lever_object["signalroutes"][signal_route.value-1]:
-            lever_valid_for_route = True
-        else:
-            lever_valid_for_route = False
-        # Switch the signal, subsidary and/or distant arm as required
-        if lever_object["switchsignal"] and lever_valid_for_route and lever_switched != library.signal_clear(linked_signal):
-            library.toggle_signal(linked_signal)
-            signal_switched_callback(linked_signal)
-        elif (lever_object["switchsubsidary"] and subsidary and lever_valid_for_route and
-                            lever_switched != library.subsidary_clear(linked_signal)):
-            library.toggle_subsidary(linked_signal)
-            subsidary_switched_callback(linked_signal)
-        elif (lever_object["switchdistant"] and dist_arms and lever_valid_for_route and
-                            lever_switched != library.signal_clear(linked_signal + 1000)):
-            library.toggle_signal(linked_signal + 1000)
-            signal_switched_callback(linked_signal)
-    elif linked_point > 0:
-        # Change the point as required and call the point_switched_callback to process any changes.
-        # We always check if the point has a FPL (before switching the FPL) to cover the case of a
-        # point configuration being changed (to no FPL) after the lever was configured.
-        has_fpl = objects.schematic_objects[objects.point(linked_point)]["hasfpl"]
-        if lever_object["switchpointandfpl"] and lever_switched != library.point_switched(linked_point):
-            if has_fpl and library.fpl_active(linked_point):
-                library.toggle_fpl(linked_point)
-            library.toggle_point(linked_point)
-            if has_fpl and not library.fpl_active(linked_point):
-                library.toggle_fpl(linked_point)
-            point_switched_callback(linked_point)
-        elif lever_object["switchpoint"] and lever_switched != library.point_switched(linked_point):
-            library.toggle_point(linked_point)
-            point_switched_callback(linked_point)
-        elif lever_object["switchfpl"] and has_fpl and lever_switched != library.fpl_active(linked_point):
-            library.toggle_fpl(linked_point)
-            fpl_switched_callback(linked_point)
-    if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
-        logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
+def synchronise_all_signalbox_levers():
+    for str_point_id in objects.point_index:
+        int_point_id = int(str_point_id)
+        synchronise_levers_with_point(int_point_id)
+        synchronise_levers_with_fpl(int_point_id)
+    for str_signal_id in objects.signal_index:
+        int_signal_id = int(str_signal_id)
+        synchronise_levers_with_signal(int_signal_id)
+        synchronise_levers_with_subsidary(int_signal_id)       
     return()
 
 ##################################################################################################

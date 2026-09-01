@@ -1,4 +1,5 @@
 #------------------------------------------------------------------------------------
+######################## TO DO - MODULE DOCUMENTATION UPDATES ###########################
 # This module contains all the functions associated with schematic route setting
 #
 # External API functions intended for use by other editor modules:
@@ -23,7 +24,7 @@
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.find_theoretical_route(signal_id)
-#    run_layout.has_subsidary(signal_id)
+#    run_common.signal_has_subsidary[signal_id:str]
 #
 #    objects.signal(signal_id) - To get the object_id for a given signal_id
 #    objects.point(point_id) - To get the object_id for a given point_id
@@ -69,6 +70,7 @@ import time
 from . import library
 from . import objects
 from . import run_layout
+from . import run_common
 
 #------------------------------------------------------------------------------------
 # The Tkinter Root and Canvas Objects are saved as global variables for easy
@@ -84,6 +86,7 @@ enhanced_debugging = False
 #------------------------------------------------------------------------------------
 # The following Dictionary holds information as to whether a route_setup is in progress or not
 #------------------------------------------------------------------------------------
+
 dict_of_route_setup_flags = {}
 
 def set_setup_in_progress_flag(route_button_id:int, flag:bool):
@@ -157,7 +160,7 @@ def check_conflicting_signals(route_object:dict, route_tooltip:str, route_viable
                 opposing_signal_id = opposing_signal_entry[0]
                 opposing_signal_object_id = objects.signal(opposing_signal_id)
                 opposing_signal_routes = opposing_signal_entry[1]
-                if (library.signal_clear(opposing_signal_id) or (run_layout.has_subsidary(opposing_signal_id)
+                if (library.signal_clear(opposing_signal_id) or (run_common.signal_has_subsidary[str(opposing_signal_id)]
                                                 and library.subsidary_clear(opposing_signal_id))):
                     # Find what the route of the opposing signal would be
                     other_signal_route = run_layout.find_theoretical_route(opposing_signal_object_id,
@@ -167,7 +170,7 @@ def check_conflicting_signals(route_object:dict, route_tooltip:str, route_viable
                     if other_signal_route is not None and opposing_signal_routes[other_signal_route.value-1]:
                         if library.signal_clear(opposing_signal_id):
                             message = "\n"+sig_type+str(signal_id)+" would be locked by signal "+str(opposing_signal_id)
-                        if run_layout.has_subsidary(opposing_signal_id) and library.subsidary_clear(opposing_signal_id):
+                        if run_common.signal_has_subsidary[str(opposing_signal_id)] and library.subsidary_clear(opposing_signal_id):
                             message = "\n"+sig_type+str(signal_id)+" would be locked by subsidary "+str(opposing_signal_id)
                         route_tooltip = route_tooltip + message
                         route_viable = False
@@ -182,7 +185,7 @@ def check_conflicting_signals(route_object:dict, route_tooltip:str, route_viable
                     message = "\n"+sig_type+str(signal_id)+" would be locked by instrument "+str(instrument_id)
                     route_tooltip = route_tooltip + message
                 # Check Locking with co-located Subsidiary Signal
-                if run_layout.has_subsidary(signal_id) and library.subsidary_clear(int(signal_id)):
+                if run_common.signal_has_subsidary[str(signal_id)] and library.subsidary_clear(int(signal_id)):
                     route_viable = False
                     message = "\n"+sig_type+str(signal_id)+" would be locked by subsidiary "+str(signal_id)
                     route_tooltip = route_tooltip + message                    
@@ -227,11 +230,12 @@ def check_conflicting_points(route_object:dict, route_tooltip:str, route_viable:
                 for index, interlocked_route in enumerate(interlocked_routes):
                     route_to_test = library.route_type(index+1)
                     if interlocked_route:
+                        signal_has_subsidary = run_common.signal_has_subsidary[str(interlocked_sig_id)] 
                         if library.signal_clear(interlocked_sig_id, route_to_test):
                             message = "\nPoint "+str_point_id+" is locked by Signal "+str(interlocked_sig_id)
                             route_tooltip = route_tooltip + message
                             route_viable = False
-                        if run_layout.has_subsidary(interlocked_sig_id) and library.subsidary_clear(interlocked_sig_id, route_to_test):
+                        if signal_has_subsidary and library.subsidary_clear(interlocked_sig_id, route_to_test):
                             message = "\nPoint "+str_point_id+" is locked by subsidary "+str(interlocked_sig_id)
                             route_tooltip = route_tooltip + message
                             route_viable = False
@@ -378,7 +382,7 @@ def initialise_all_schematic_routes():
                         if library.signal_clear(int(str_signal_id)) and not automatic_signal:
                             library.toggle_signal(int(str_signal_id))
                     for str_signal_id in route_definition["subsidariesonroute"]:
-                        if run_layout.has_subsidary(int(str_signal_id)) and library.subsidary_clear(int(str_signal_id)):
+                        if run_common.signal_has_subsidary[str_signal_id] and library.subsidary_clear(int(str_signal_id)):
                             library.toggle_subsidary(int(str_signal_id))
                 # Toggle the button OFF and finish clearing down the route
                 library.toggle_button(int(str_route_button_id))
@@ -531,78 +535,7 @@ def trigger_routes_after_signal_passed(signal_id:int):
                     route_button_deselected_callback(int(str_route_button_id))
     return()
 
-#-------------------------------------------------------------------------------------------------
-# The following class and functions are used to process the setting up and clearing
-# down of schematic routes, one action at a time (with a delay in between if specified).
-# As the state of signals and points along the route may have changed between the time
-# the tasks were scheduled and when they actually get run, we always test to see if the
-# change is still possible (e.g. not possible if the signal or point has been locked)
-# The schedule_task class is used to schedule the other functions at a point in the
-# future when the set_schematic_route and clear_schematic route functions are run.
-# Note we only run the tasks if we are still in RUN MODE. The exception to this is
-# complete_route_cleardown where we could be doing this after switching to EDIT Mode
-#
-# After each change, we call the appropriate event callback function in run layout to
-# complete the required processing (interlocking, aspect updates etc) to preserve the
-# overall integrity of the layout configuration. We pass the optional 'route_button_id' into
-# these functions so this can be forwarded to the various "check routes are still valid"
-# functions in this module - This is so any changes required to set up or clear down a
-# route won't trigger a route re-set - eg set FPL off before changing a point
-#
-# We also call the root.update_idletasks() function to ensure that all schematic object
-# changes are processed after each event - I saw occasional instances of the route lines
-# not being unhighlighted after resetting the layout with a delay of zero - possibly
-# because I was flooding the tkinter main loop with events via the root.after() method??
-#-------------------------------------------------------------------------------------------------
 
-class schedule_task():
-    def __init__(self, delay:int, function, *args):
-        root.after(delay, lambda:function(*args))
-
-def set_switch_state(route_button_id:int, switch_id:int, state:bool):
-    if library.button_state(switch_id) != state:
-        library.toggle_button(switch_id)
-        run_layout.switch_updated_callback(switch_id, route_button_id)
-        root.update_idletasks()
-    return()
-
-def set_signal_state(route_button_id:int, signal_id:int, state:bool):
-    if library.signal_clear(signal_id) != state:
-        # Note if the signal is OFF and LOCKED then we always change it (Layout Reset use case)
-        # Just in case the layout has got into a weird, erroneous interlocking state.
-        if not library.signal_locked(signal_id) or library.signal_clear(signal_id):
-            library.toggle_signal(signal_id)
-            run_layout.signal_switched_callback(signal_id, route_button_id)
-            root.update_idletasks()
-    return()
-
-def set_subsidary_state(route_button_id:int, signal_id:int, state:bool):
-    if run_layout.has_subsidary(signal_id) and library.subsidary_clear(signal_id) != state:
-        # Note if the subsidary is OFF and LOCKED then we always change it (Layout Reset use case)
-        # Just in case the layout has got into a weird, erroneous interlocking state.
-        if not library.subsidary_locked(signal_id) or library.subsidary_clear(signal_id):
-            library.toggle_subsidary(signal_id)
-            run_layout.subsidary_switched_callback(signal_id, route_button_id)
-            root.update_idletasks()
-    return()
-
-def set_fpl_state(route_button_id:int, point_id:int, state:bool):
-    if objects.schematic_objects[objects.point(point_id)]["hasfpl"]:
-        if library.fpl_active(point_id) != state and not library.point_locked(point_id):
-            library.toggle_fpl(point_id)
-            run_layout.fpl_switched_callback(point_id, route_button_id)
-            root.update_idletasks()
-    return()
-
-def set_point_state(route_button_id:int, point_id:int, state:bool):
-    # If a point does not have a FPL then the 'has_fpl' function will return True
-    point_has_fpl = objects.schematic_objects[objects.point(point_id)]["hasfpl"]
-    if not point_has_fpl or not library.fpl_active(point_id):
-        if library.point_switched(point_id) != state and not library.point_locked(point_id):
-            library.toggle_point(point_id)
-            run_layout.point_switched_callback(point_id, route_button_id)
-            root.update_idletasks()
-    return()
 
 def complete_route_setup(route_button_id:int, dont_enable_disable_schematic_routes:bool=False):
     # Signify that the route setup has now completed
@@ -691,53 +624,6 @@ def complete_route_cleardown(route_button_id:int, dont_enable_disable_schematic_
     logging.info("RUN ROUTES - Clear-down of Route "+str(route_button_id)+" is now complete **********************************")
     return()
 
-#------------------------------------------------------------------------------------
-# Common functions to schedule the tasks needed to reset all signals, points and DCC
-# switches back to their default states - used by the route_button_deselected_callback
-# function. Also by the reset_layout function in run_layout
-#------------------------------------------------------------------------------------
-
-def schedule_tasks_to_reset_signals(list_of_signals:list, switch_delay:int, route_button_id:int, delay:int):
-    for signal_id in list_of_signals:
-        # Note we only reset the signal to ON if not an automatic signal
-        automatic_signal = objects.schematic_objects[objects.signal(signal_id)]["fullyautomatic"]
-        if library.signal_clear(int(signal_id)) and not automatic_signal:
-            schedule_task(delay, set_signal_state, route_button_id, int(signal_id), False)
-            delay = delay + switch_delay
-    return(delay)
-
-def schedule_tasks_to_reset_subsidaries(list_of_subsidaries:list, switch_delay:int, route_button_id:int, delay:int):
-    for signal_id in list_of_subsidaries:
-        if run_layout.has_subsidary(int(signal_id)) and library.subsidary_clear(int(signal_id)):
-            schedule_task(delay, set_subsidary_state, route_button_id, int(signal_id), False)
-            delay = delay + switch_delay
-    return(delay)
-
-def schedule_tasks_to_reset_points(list_of_points:list, switch_delay:int, route_button_id:int, delay:int):
-    for point_id in list_of_points:
-        point_has_fpl = objects.schematic_objects[objects.point(str(point_id))]["hasfpl"]
-        automatic_point = objects.schematic_objects[objects.point(str(point_id))]["automatic"]
-        if not automatic_point:
-            if library.point_switched(int(point_id)):
-                if point_has_fpl and library.fpl_active(int(point_id)):
-                    schedule_task(delay, set_fpl_state, route_button_id, int(point_id), False)
-                    delay = delay + switch_delay
-                schedule_task(delay, set_point_state, route_button_id, int(point_id), False)
-                delay = delay + switch_delay
-                if point_has_fpl:
-                    schedule_task(delay, set_fpl_state, route_button_id, int(point_id), True)
-                    delay = delay + switch_delay
-            elif point_has_fpl and not library.fpl_active(int(point_id)):
-                schedule_task(delay, set_fpl_state, route_button_id, int(point_id), True)
-                delay = delay + switch_delay
-    return(delay)
-
-def schedule_tasks_to_reset_switches(list_of_switches:list, switch_delay:int, route_button_id:int, delay:int):
-    for switch_id in list_of_switches:
-        if library.button_state(int(switch_id)):
-            schedule_task(delay, set_switch_state, route_button_id, int(switch_id), False)
-            delay = delay + switch_delay
-    return(delay)
 
 #------------------------------------------------------------------------------------
 # Callback function for when a route button is SELECTED. If the selection is an Exit
@@ -1010,14 +896,14 @@ def schedule_tasks_to_setup_schematic_route(route_button_id:int, route_definitio
     # easily catch this at config time). In this case the signal takes precidence (the subsidary is ignored)
     for signal_id in route_definition["signalsonroute"]:
         if not library.signal_clear(signal_id):
-            if run_layout.has_subsidary(signal_id) and library.subsidary_clear(signal_id):
+            if run_common.signal_has_subsidary[str(signal_id)] and library.subsidary_clear(signal_id):
                 schedule_task(delay, set_subsidary_state, route_button_id, signal_id, False)
                 delay = delay + route_object["switchdelay"]
             schedule_task(delay, set_signal_state, route_button_id, signal_id, True)
             delay = delay + route_object["switchdelay"]
     for signal_id in route_definition["subsidariesonroute"]:
         if signal_id not in route_definition["signalsonroute"]:
-            if run_layout.has_subsidary(signal_id) and not library.subsidary_clear(signal_id):
+            if run_common.signal_has_subsidary[str(signal_id)] and not library.subsidary_clear(signal_id):
                 if library.signal_clear(signal_id):
                     schedule_task(delay, set_signal_state, route_button_id, signal_id, False)
                     delay = delay + route_object["switchdelay"]
@@ -1232,10 +1118,6 @@ def reset_remaining_routes():
     enable_disable_schematic_routes()
     return()
 
-def schedule_tasks_to_reset_remaining_routes(switch_delay:int, delay:int):
-    schedule_task(delay, reset_remaining_routes)
-    delay = delay + switch_delay
-    return(delay)
 
 ##################################################################################################
 
