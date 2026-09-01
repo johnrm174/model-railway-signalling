@@ -670,7 +670,7 @@ def make_server_status_updated_callbacks():
     # Callback comprises (status (True=Running, False=Stopped), [list_of_connected_clients])
     server_running = bool(server_loop and server_loop.is_running())
     with list_of_connected_clients_lock:
-        list_of_connected_clients_snapshot = list_of_connected_clients.copy():
+        list_of_connected_clients_snapshot = list_of_connected_clients.copy()
     for server_status_callback in server_status_callbacks:
         library.execute_function_in_tkinter_thread(lambda:server_status_callback(server_running, list_of_connected_clients_snapshot))
 
