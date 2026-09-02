@@ -119,10 +119,10 @@ def set_point_state(route_button_id:int, point_id:int, state:bool):
 
 def refresh_all_routing_data_runtime_caches():
     # Rebuild the runtime cackes of routing information for all signals/sensors
-    signals_to_update = list(objects.signal_index.keys())
-    sensors_to_update = list(objects.track_sensor_index.keys())
-    refresh_signal_routing_data_runtime_caches(signals_to_update=signals_to_update)
-    refresh_sensor_routing_data_runtime_caches(sensors_to_update=sensors_to_update)
+    signals_to_check = list(objects.signal_index.keys())
+    sensors_to_check = list(objects.track_sensor_index.keys())
+    refresh_signal_routing_data_runtime_caches(signals_to_check=signals_to_check)
+    refresh_sensor_routing_data_runtime_caches(sensors_to_check=sensors_to_check)
 
 #------------------------------------------------------------------------------------
 # Common functions to schedule the tasks needed to reset all signals, points and DCC
@@ -239,15 +239,17 @@ signal_has_dist_arms = {}
 signal_is_home_signal = {}
 signal_is_dist_signal = {}
 signal_is_colour_light = {}
+signal_supports_approach_control = {}
 point_has_fpl = {}
 # The following cache dictionaries hold lists of str_item_ids
-signal_str_linked_points = {}
-signal_str_linked_signals = {}
+signal_str_interlocked_points = {}
+signal_str_interlocked_signals = {}
 signal_str_linked_sections = {}
-point_str_linked_signals = {}
-point_str_linked_sensors = {}
+point_str_interlocked_signals = {}
+point_str_linked_track_sensors = {}
+section_str_interlocked_signals = {}
+section_str_interlocked_points = {}
 section_str_linked_signals = {}
-section_str_linked_points = {}
 instrument_str_linked_signals = {}
 # The signal_levers cache holds a dict: {"levertype": str, "signalroutes": list}
 # The possible levertype values are "switchsignal", "switchsubsidary", "switchdistant"
@@ -264,34 +266,38 @@ def refresh_static_data_runtime_caches():
     global signal_is_home_signal
     global signal_is_dist_signal
     global signal_is_colour_light
-    global signal_str_linked_points
-    global signal_str_linked_signals
+    global signal_str_interlocked_points
+    global signal_str_interlocked_signals
     global signal_str_linked_sections
+    global signal_supports_approach_control
     global signal_levers
-    global point_str_linked_signals
-    global point_str_linked_sensors
+    global point_str_interlocked_signals
+    global point_str_linked_track_sensors
     global point_has_fpl
     global point_levers
+    global section_str_interlocked_signals
+    global section_str_interlocked_points
     global section_str_linked_signals
-    global section_str_linked_points
     global instrument_str_linked_signals
     # Completely clear the existing signal caches
     signal_has_subsidary.update({})
     signal_has_dist_arms.update({})
+    signal_supports_approach_control.update({})
     signal_is_home_signal.update({})
     signal_is_dist_signal.update({})
     signal_is_colour_light.update({})
-    signal_str_linked_points.update({})
-    signal_str_linked_signals.update({})
+    signal_str_interlocked_points.update({})
+    signal_str_interlocked_signals.update({})
     signal_levers.update({})
     # Completely clear the existing point caches
     point_has_fpl.update({})
     point_levers.update({})
-    point_str_linked_signals.update({})
-    point_str_linked_sensors.update({})
+    point_str_interlocked_signals.update({})
+    point_str_linked_track_sensors.update({})
     # Completely clear the existing Track Section caches
     section_str_linked_signals.update({})
-    section_str_linked_points.update({})
+    section_str_interlocked_signals.update({})
+    section_str_interlocked_points.update({})
     # Completely clear the existing Block Instrument caches
     instrument_str_linked_signals.update({})
     #-------------------------------------------------------
@@ -300,8 +306,9 @@ def refresh_static_data_runtime_caches():
     for str_section_id in objects.section_index:
         # Set the linked signals and points lists to None initially. These are populated
         # during the rebuild of the point caches and rebuild of the signal cashes (below)
+        section_str_interlocked_signals[str_section_id] = []
+        section_str_interlocked_points[str_section_id] = []
         section_str_linked_signals[str_section_id] = []
-        section_str_linked_points[str_section_id] = []
     #-------------------------------------------------------
     # Rebuild the Block_instrument Caches
     #-------------------------------------------------------
@@ -318,14 +325,14 @@ def refresh_static_data_runtime_caches():
         # Set lever mappings to none (updated below) 
         point_levers[str_point_id] = {}
         # Set the linked signals/sensors list to none initially (updated below)
-        point_str_linked_signals[str_point_id] = []
-        point_str_linked_sensors[str_point_id] = []
+        point_str_interlocked_signals[str_point_id] = []
+        point_str_linked_track_sensors[str_point_id] = []
         # Update the track section cache with the references to any interlocked points
         # The interlocked Sections table is a variable length list of Track Section IDs
         for int_section_id in point_object["sectioninterlock"]:
             str_section_id = str(int_section_id)
-            if str_point_id not in section_str_linked_points[str_section_id]:
-                section_str_linked_points[str_section_id].append(str_point_id)
+            if str_point_id not in section_str_interlocked_points[str_section_id]:
+                section_str_interlocked_points[str_section_id].append(str_point_id)
     #-------------------------------------------------------
     # Rebuild the Track Sensor Caches
     #-------------------------------------------------------
@@ -340,15 +347,15 @@ def refresh_static_data_runtime_caches():
             for point_setting in list_of_point_settings:
                 int_point_id = point_setting[0]
                 str_point_id = str(int_point_id)
-                if str_sensor_id not in point_str_linked_sensors[str_point_id]:
-                    point_str_linked_sensors[str_point_id].append(str_sensor_id)
+                if str_sensor_id not in point_str_linked_track_sensors[str_point_id]:
+                    point_str_linked_track_sensors[str_point_id].append(str_sensor_id)
         for route_element in sensor_object["routebehind"]:
             list_of_point_settings = route_element[0]
             for point_setting in list_of_point_settings:
                 int_point_id = point_setting[0]
                 str_point_id = str(int_point_id)
-                if str_sensor_id not in point_str_linked_sensors[str_point_id]:
-                    point_str_linked_sensors[str_point_id].append(str_sensor_id)
+                if str_sensor_id not in point_str_linked_track_sensors[str_point_id]:
+                    point_str_linked_track_sensors[str_point_id].append(str_sensor_id)
     #-------------------------------------------------------
     # Rebuild the Signal Caches
     #-------------------------------------------------------
@@ -377,21 +384,25 @@ def refresh_static_data_runtime_caches():
                                                    signal_object["itemsubtype"] == library.signal_subtype.distant.value ) or
                                                  ( signal_object["itemtype"] == library.signal_type.semaphore.value and
                                                    signal_object["itemsubtype"] == library.signal_subtype.distant.value ) )
+        # Only main signal types support approach control modes
+        signal_is_colour_light[str_signal_id] =  signal_object["itemtype"] == library.signal_type.colour_light.value
+        signal_supports_approach_control[str_signal_id] =  ( signal_object["itemtype"] == library.signal_type.colour_light.value or
+                                                             signal_object["itemtype"] == library.signal_type.semaphore.value )
         # Compile the caches for points and signals associated with a signal (routing and interlocking)
         # The "pointinterlock" table comprises a list of route definitions: [MAIN, LH1, LH2, RH1, RH2]
         # Each route definition comprises: [list_of_point_settings, signal_id, block_inst_id]
         # Where each point setting (in the list of point settings) is [point_id, point_state]
-        signal_str_linked_points[str_signal_id] = []
+        signal_str_interlocked_points[str_signal_id] = []
         for route_element in signal_object["pointinterlock"]:
             list_of_point_settings = route_element[0]
             for point_setting in list_of_point_settings:
                 int_point_id = point_setting[0]
                 str_point_id = str(int_point_id)
-                if str_point_id not in signal_str_linked_points[str_signal_id]:
-                    signal_str_linked_points[str_signal_id].append(str_point_id)
+                if str_point_id not in signal_str_interlocked_points[str_signal_id]:
+                    signal_str_interlocked_points[str_signal_id].append(str_point_id)
                     # Update the interlocked signals cache got the point at the same time
-                    if str_signal_id not in point_str_linked_signals[str_point_id]:
-                        point_str_linked_signals[str_point_id].append(str_signal_id)
+                    if str_signal_id not in point_str_interlocked_signals[str_point_id]:
+                        point_str_interlocked_signals[str_point_id].append(str_signal_id)
             # Populate the instrument cache with the back reference to the signal
             int_instrument_id = route_element[2]
             if int_instrument_id > 0:
@@ -399,27 +410,46 @@ def refresh_static_data_runtime_caches():
         # The "siginterlock" table comprises a list of route definitions [MAIN, LH1, LH2, LH3, RH1, RH2, RH3]
         # Each route definition comprises a variable length list of signal elements [sig1, sig2, etc, ]
         # Each signal element comprises [sig_id, [MAIN, LH1, LH2, LH3, RH1, RH2, RH3]]
-        if str_signal_id not in signal_str_linked_signals:
-            signal_str_linked_signals[str_signal_id] = []
+        if str_signal_id not in signal_str_interlocked_signals:
+            signal_str_interlocked_signals[str_signal_id] = []
         # Always add the current signal ID to the signal's list of linked signals
-        if str_signal_id not in signal_str_linked_signals[str_signal_id]:
-            signal_str_linked_signals[str_signal_id].append(str_signal_id)
+        if str_signal_id not in signal_str_interlocked_signals[str_signal_id]:
+            signal_str_interlocked_signals[str_signal_id].append(str_signal_id)
         for route_element in signal_object["siginterlock"]:
             for signal_entry in route_element:
                 int_signal_in_route_id = signal_entry[0]
                 str_signal_in_route_id = str(int_signal_in_route_id)
-                if str_signal_in_route_id not in signal_str_linked_signals:
-                    signal_str_linked_signals[str_signal_in_route_id] = []
-                if str_signal_id not in signal_str_linked_signals[str_signal_in_route_id]:
-                    signal_str_linked_signals[str_signal_in_route_id].append(str_signal_id)
+                if str_signal_in_route_id not in signal_str_interlocked_signals:
+                    signal_str_interlocked_signals[str_signal_in_route_id] = []
+                if str_signal_id not in signal_str_interlocked_signals[str_signal_in_route_id]:
+                    signal_str_interlocked_signals[str_signal_in_route_id].append(str_signal_id)
         # Update the track section caches with references to any interlocked signals (for interlocking)
         # The 'trackinterlock' element comprises a list of route elements: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
         # Each route element contains a variable length list of interlocked Section IDs for that route
         for route_element in signal_object["trackinterlock"]:
             for int_section_id in route_element:
                 str_section_id = str(int_section_id)
-                if str_signal_id not in section_str_linked_signals[str_section_id]:
-                    section_str_linked_signals[str_section_id].append(str_signal_id)
+                if str_signal_id not in section_str_interlocked_signals[str_section_id]:
+                    section_str_interlocked_signals[str_section_id].append(str_signal_id)
+        # Update the track section caches with references to any linked signals (for overriding based on occupancy)
+        # The 'tracksections' element is a list comprising: [section_behind, signal_route_definitions]
+        # The 'signal_route_definitions' element comprises a list_of_signal_route_elements: [MAIN,LH1,LH2,LH3,RH1,RH2,RH3]
+        # Each signal_route_element comprises a variable length list of track section IDs: [T1,etc] - with at least 1 entry
+        track_occupancy_table = signal_object["tracksections"]
+        # Compile a list of referenced track sections (from section behind and sections ahead
+        int_track_section_ids_referenced_by_signal = []
+        print (track_occupancy_table)
+        if track_occupancy_table[0] > 0:
+            int_track_section_ids_referenced_by_signal.append(track_occupancy_table[0])
+        for list_of_int_track_section_ids_for_route in track_occupancy_table[1]:
+            # Remove any zero values from the list of track sections for the route
+            cleaned_list_of_int_track_section_ids = [x for x in list_of_int_track_section_ids_for_route if x != 0]
+            int_track_section_ids_referenced_by_signal.extend(cleaned_list_of_int_track_section_ids)
+        # Remove any duplicate IDs
+        int_track_section_ids_referenced_by_signal = list(set(int_track_section_ids_referenced_by_signal))
+        # Now update the cache of each referenced track section with a back reference to the signal
+        for int_track_section_id in int_track_section_ids_referenced_by_signal:
+            section_str_linked_signals[str(int_track_section_id)].append(str_signal_id)                      
         # Set lever mappings to none initially (updated below) 
         signal_levers[str_signal_id] = {}
     #-------------------------------------------------------
@@ -478,7 +508,7 @@ signal_str_signal_ahead = {}
 # is no Instrument defined/found on the route then the value will be None 
 signal_int_instrument_ahead = {}
 
-def refresh_signal_routing_data_runtime_caches(signals_to_update:list[str]):
+def refresh_signal_routing_data_runtime_caches(signals_to_check:list[str]):
     global signal_valid_route_ahead
     global signal_locked_route_ahead
     global signal_str_signal_behind
@@ -488,7 +518,7 @@ def refresh_signal_routing_data_runtime_caches(signals_to_update:list[str]):
     # Build the default cache for signal_ahead and signal_behind
     # For all affected signals and the signal_behind
     # Rebuild the Signal Caches
-    for str_signal_id in signals_to_update:
+    for str_signal_id in signals_to_check:
         # Find the first viable route ahead of the signal
         str_signal_object_id = objects.signal(str_signal_id)
         signal_object = objects.schematic_objects[str_signal_object_id]
@@ -549,14 +579,14 @@ def refresh_signal_routing_data_runtime_caches(signals_to_update:list[str]):
 # These caches are for the 'dynamic' run layout configuration for Track Sensors.
 #------------------------------------------------------------------------------------
 
-def refresh_sensor_routing_data_runtime_caches(sensors_to_update:list):
+def refresh_sensor_routing_data_runtime_caches(sensors_to_check:list):
     global sensor_valid_route_ahead
     global sensor_valid_route_behind
     # Completely clear the existing caches
     sensor_valid_route_ahead.clear()
     sensor_valid_route_behind.clear()
     # Rebuild the Track Sensor Caches
-    for str_sensor_id in sensors_to_update:
+    for str_sensor_id in sensors_to_check:
         # Find the first viable route ahead of the sensor
         str_sensor_object_id = objects.track_sensor(str_sensor_id)
         sensor_route_ahead, points_locked = find_route(str_sensor_object_id, "routeahead")
@@ -579,14 +609,15 @@ list_of_movements = []
 
 def initialise_layout():
     global list_of_movements
-    points_to_update = list(objects.point_index.keys())
-    signals_to_update = list(objects.signal_index.keys())
-    sensors_to_update = list(objects.track_sensor_index.keys())
+    points_to_check = list(objects.point_index.keys())
+    signals_to_check = list(objects.signal_index.keys())
+    sensors_to_check = list(objects.track_sensor_index.keys())
+    sections_to_check = list(objects.section_index.keys())
     # Reset/rebuild the cache of static configuration data to simplify processing at run time
     refresh_static_data_runtime_caches()
     # Rebuild the runtime cackes of routing information for all signals/sensors
-    refresh_signal_routing_data_runtime_caches(signals_to_update=signals_to_update)
-    refresh_sensor_routing_data_runtime_caches(sensors_to_update=sensors_to_update)
+    refresh_signal_routing_data_runtime_caches(signals_to_check=signals_to_check)
+    refresh_sensor_routing_data_runtime_caches(sensors_to_check=sensors_to_check)
     # Clear the list of movements
     list_of_movements.clear()
     if run_mode and automation_enabled:
@@ -604,8 +635,8 @@ def initialise_layout():
         run_layout.clear_all_approach_control()
         run_layout.update_all_displayed_signal_aspects()
     # We always process interlocking - for all modes whether automation is enabled/disabled
-    run_layout.process_signal_interlocking(signals_to_update = signals_to_update)
-    run_layout.process_point_interlocking(points_to_update = points_to_update)
+    run_layout.process_signal_interlocking(signals_to_check = signals_to_check)
+    run_layout.process_point_interlocking(points_to_check = points_to_check)
     # In EDIT mode all schematic routes are cleared down, unhighlighted and all route buttons disabled
     # In RUN mode, any schematic routes that are still selected are highlighted (layout load use case)
     run_routes.enable_disable_schematic_routes()
@@ -613,7 +644,7 @@ def initialise_layout():
     # Update all signalbox levers to reflect the current state of points and signals
     run_layout.synchronise_all_signalbox_levers()
     # Update any route highlighting (to show track sections occupied)
-    run_layout.update_route_highlighting_for_sections()
+    run_layout.update_line_and_point_highlighting(sections_to_check = sections_to_check)
     # Refocus back on the canvas to ensure that any keypress events function
     canvas.focus_set()
     return()
@@ -696,12 +727,12 @@ def point_switched_callback(int_point_id:int, route_id:int=0):
         start_time = time.time()
     # Signals and track sensor routes could be affected by point changes
     run_layout.synchronise_levers_with_point(int_point_id)
-    potentially_affected_signals = point_str_linked_signals[str(int_point_id)]
-    potentially_affected_sensors = point_str_linked_sensors[str(int_point_id)]
-    refresh_signal_routing_data_runtime_caches(signals_to_update = potentially_affected_signals)
-    refresh_sensor_routing_data_runtime_caches(sensors_to_update = potentially_affected_sensors)
+    signals_to_check = point_str_interlocked_signals[str(int_point_id)]
+    sensors_to_check = point_str_linked_track_sensors[str(int_point_id)]
+    refresh_signal_routing_data_runtime_caches(signals_to_check = signals_to_check)
+    refresh_sensor_routing_data_runtime_caches(sensors_to_check = sensors_to_check)
     # Signal interlocking could be affected by point changes (new route not valid)
-    run_layout.process_signal_interlocking(signals_to_update = potentially_affected_signals)
+    run_layout.process_signal_interlocking(signals_to_check = signals_to_check)
     # Any change in the state of a point could invalidate a route
     run_routes.check_routes_valid_after_point_change(int_point_id, route_id)
     if enhanced_debugging:
@@ -716,9 +747,9 @@ def fpl_switched_callback(int_point_id:int, route_id:int=0):
     run_layout.synchronise_levers_with_fpl(int_point_id)
     # Only signal interlocking could be affected by FPL changes (not signal or sensor routing)
     # but we need to refresh the routing data to see if the validity of the route has changed
-    potentially_affected_signals = point_str_linked_signals[str(int_point_id)]
-    refresh_signal_routing_data_runtime_caches(signals_to_update = potentially_affected_signals)
-    run_layout.process_signal_interlocking(signals_to_update = potentially_affected_signals)
+    signals_to_check = point_str_interlocked_signals[str(int_point_id)]
+    refresh_signal_routing_data_runtime_caches(signals_to_check = signals_to_check)
+    run_layout.process_signal_interlocking(signals_to_check = signals_to_check)
     # Any change in the state of a point could invalidate a route
     run_routes.check_routes_valid_after_point_change(int_point_id, route_id)
     if enhanced_debugging:
@@ -726,23 +757,27 @@ def fpl_switched_callback(int_point_id:int, route_id:int=0):
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
-def signal_updated_callback(signal_id:Union[int,str]):
+def signal_updated_callback(signal_id:Union[int,str], aspect_has_changed:bool):
+    # This is the case of the signal's displayed aspect changing, either:
+    #     A local signal changing aspect as part of a timed signal sequence - local ID
+    #     A remote signal changing (where we get notified via MQTT) - Remote ID
     if enhanced_debugging:
         logging.debug("############################## signal_updated_callback "+str(signal_id))
         start_time = time.time()
-    # This is the case of the signal's displayed aspect changing, either
-    # A local signal changing aspect as part of a timed signal sequence - local ID
-    # A remote signal changing (where we get notified via MQTT) - Remote ID
+    # Distant signals can be interlocked with Home signals ahead at DANGER so any change to the
+    # displayed aspect of a signal could affect the interlocking of any distant signals behind
+    run_layout.process_signal_interlocking(signals_to_check = signals_to_check)
+    # Distant signals can be interlocked with Home signals ahead (locked ON) and overridden
+    # (to Caution) if any Home signals on the route ahead are displaying DANGER. To minimise
+    # Processing we walk the route behind this signal to find the previous distant signal
+    distant_signals_to_check = [find_distant_signal_behind_home_signal(str(signal_id))]
+    
     if run_mode and automation_enabled:
         run_layout.update_approach_control_status_for_all_signals() ####################################################
         run_layout.override_distant_signals_based_on_signals_ahead() ###################################################
     else:
-        run_layout.process_signal_aspect_update(signal_id) #############################################################
+        run_layout.process_signal_aspect_update(str(signal_id))
         signal_str_dist_signal_behind[str_signal_id] ###################################################################
-    # Distant signals can be interlocked with Home signals ahead at DANGER so any change to the
-    # displayed aspect of a signal could affect the interlocking of any distant signals behind
-    potentially_affected_distant_signal = find_distant_signal_behind_home_signal(str(signal_id))
-    run_layout.process_signal_interlocking(signals_to_update = potentially_affected_distant_signal)
     run_routes.enable_disable_schematic_routes()   ################???????????????????????##############################
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
@@ -756,16 +791,15 @@ def signal_switched_callback(int_signal_id:int, route_id:int=0):
         start_time = time.time()
     run_layout.synchronise_levers_with_signal(int_signal_id)
     if run_mode and automation_enabled:
-        run_layout.override_signals_based_on_track_sections_ahead() ###################################################
         run_layout.update_approach_control_status_for_all_signals(int_signal_id)   #################################### 
         run_layout.override_distant_signals_based_on_signals_ahead() ##################################################
     else:
         run_layout.process_signal_aspect_update(int_signal_id) ########################################################
     # Any change to the state of a signal could impact the interlocking of opposing signals and points
-    potentially_affected_points = signal_str_linked_points[str(int_signal_id)]
-    potentially_affected_signals = signal_str_linked_signals[str(int_signal_id)]
-    run_layout.process_signal_interlocking(signals_to_update = potentially_affected_signals)
-    run_layout.process_point_interlocking(points_to_update = potentially_affected_points)
+    points_to_check = signal_str_interlocked_points[str(int_signal_id)]
+    signals_to_check = signal_str_interlocked_signals[str(int_signal_id)]
+    run_layout.process_signal_interlocking(signals_to_check = signals_to_check)
+    run_layout.process_point_interlocking(points_to_check = points_to_check)
     # Any change in the state of a signal could invalidate a route
     run_routes.check_routes_valid_after_signal_change(int_signal_id, route_id) 
     run_routes.enable_disable_schematic_routes() ######################################################################
@@ -779,13 +813,11 @@ def subsidary_switched_callback(int_signal_id:int, route_id:int=0):
         logging.debug("############################## subsidary_switched_callback "+str(int_signal_id))
         start_time = time.time()
     run_layout.synchronise_levers_with_subsidary(int_signal_id)
-    if run_mode and automation_enabled:
-        run_layout.override_signals_based_on_track_sections_ahead() ##################################################
     # Any change to the state of a signal could impact the interlocking of opposing signals and points
-    potentially_affected_signals = signal_str_linked_signals[str(int_signal_id)]
-    potentially_affected_points = signal_str_linked_points[str(int_signal_id)]
-    run_layout.process_signal_interlocking(signals_to_update = potentially_affected_signals)
-    run_layout.process_point_interlocking(points_to_update = potentially_affected_points)
+    signals_to_check = signal_str_interlocked_signals[str(int_signal_id)]
+    points_to_check = signal_str_interlocked_points[str(int_signal_id)]
+    run_layout.process_signal_interlocking(signals_to_check = signals_to_check)
+    run_layout.process_point_interlocking(points_to_check = points_to_check)
     # Any change in the state of a signal could invalidate a route
     run_routes.check_routes_valid_after_subsidary_change(int_signal_id, route_id) 
     run_routes.enable_disable_schematic_routes() #####################################################################
@@ -802,11 +834,11 @@ def signal_passed_callback(int_signal_id:int):
         run_layout.update_track_occupancy_for_signal(int_signal_id)
     if run_mode and automation_enabled:
         run_layout.trigger_timed_signal_sequence(int_signal_id)
-        run_layout.update_approach_control_status_for_all_signals()
-        run_layout.override_distant_signals_based_on_signals_ahead()
+        run_layout.update_approach_control_status_for_all_signals() ######################################
+        run_layout.override_distant_signals_based_on_signals_ahead() ###################################
     else:
-        run_layout.process_signal_aspect_update(int_signal_id)
-    run_routes.trigger_routes_after_signal_passed(int_signal_id)
+        run_layout.process_signal_aspect_update(int_signal_id) ##########################################
+    run_routes.trigger_routes_after_signal_passed(int_signal_id) ############################################
     run_routes.enable_disable_schematic_routes()
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
@@ -847,17 +879,21 @@ def section_updated_callback(section_id:int):
         logging.debug("############################## section_updated_callback "+str(section_id))
         start_time = time.time()
     if run_mode:
-        run_layout.update_route_highlighting_for_sections() #################################################
+        # A Track section has been toggled between OCCUPIED/UNOCCUPIED
+        # We need to update the highlighting associated with the track section
+        run_layout.update_line_and_point_highlighting(str(section_id))
         if automation_enabled:
-            run_layout.override_signals_based_on_track_sections_ahead() ######################################
+            # Signal override state can changer after a change in track occupancy
+            signals_to_check = section_str_linked_signals[str(section_id)]
+            override_signals_based_on_track_sections_ahead(signals_to_check = signals_to_check)
             run_layout.update_approach_control_status_for_all_signals() ####################################
             run_layout.override_distant_signals_based_on_signals_ahead() ###################################
     # Both Signals and points can be interlocked with occupied track sections (track circuits)
     # so any change to the state of a track section could impact the interlocking
-    potentially_affected_signals = section_str_linked_signals[str(section_id)]
-    potentially_affected_points = section_str_linked_points[str(section_id)]
-    run_layout.process_signal_interlocking(signals_to_update = potentially_affected_signals)
-    run_layout.process_point_interlocking(points_to_update = potentially_affected_points)
+    signals_to_check = section_str_interlocked_signals[str(section_id)]
+    points_to_check = section_str_interlocked_points[str(section_id)]
+    run_layout.process_signal_interlocking(signals_to_check = signals_to_check)
+    run_layout.process_point_interlocking(points_to_check = points_to_check)
     # Any change to the interlocking could impact the validity of routes
     run_routes.enable_disable_schematic_routes() ##############################################################
     if enhanced_debugging:
@@ -871,8 +907,8 @@ def instrument_updated_callback(instrument_id:int):
         start_time = time.time()
     # Signals can be interlocked with Block Instruments on the route ahead, so 
     # any change to the state of an instrument could impact the interlocking
-    potentially_affected_signals = instrument_str_linked_signals[str(instrument_id)]
-    run_layout.process_signal_interlocking(list(potentially_affected_signals))
+    signals_to_check = instrument_str_linked_signals[str(instrument_id)]
+    run_layout.process_signal_interlocking(list(signals_to_check))
     # Any change to the interlocking could impact the validity of routes
     run_routes.enable_disable_schematic_routes() ##########################################################
     if enhanced_debugging:
