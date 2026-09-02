@@ -40,7 +40,7 @@
 #
 # Classes and functions used by the other library modules:
 #
-#   update_colour_light_signal(sig_id:int, sig_ahead_id) - update the aspect of the signal
+#   update_colour_light_signal(sig_id:int, sig_ahead_id) - update the aspect (returns anpect_changed flag)
 #   update_colour_light_subsidary(sig_id:int) - to update the subsidary aspect after a change in state
 #   update_feather_route_indication(sig_id:int, route_to_set) - to update the route indication (feathers)
 #   trigger_timed_colour_light_signal(sig_id:int, start_delay:int, time_delay:int) - trigger a timed sequence
@@ -294,7 +294,8 @@ def update_colour_light_subsidary(sig_id:int):
         new_state = signals.signal_state_type.DANGER
     else:
         new_state = signals.signal_state_type.PROCEED
-    if new_state != old_state:
+    aspect_has_changed = new_state != old_state
+    if aspect_has_changed:
         if new_state == signals.signal_state_type.DANGER:
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos1"],fill="grey")
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["pos2"],fill="grey")
@@ -311,7 +312,7 @@ def update_colour_light_subsidary(sig_id:int):
         if signals.signals[str(sig_id)]["subsidarytheatre"]:
             signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=sig_at_danger)
         signals.signals[str(sig_id)]["substate"] = new_state
-    return ()
+    return(aspect_has_changed)
 
 #-------------------------------------------------------------------------
 # Function to Refresh the displayed signal aspect according the signal state
@@ -442,7 +443,8 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
     # MQTT/DCC messages are sent out to reflect the post-creation state of the signal.
     #---------------------------------------------------------------------------------
     current_aspect = signals.signals[str(sig_id)]["sigstate"]
-    if new_aspect != current_aspect:
+    aspect_has_changed = new_aspect != current_aspect
+    if aspect_has_changed:
         logging.info("Signal "+str(sig_id)+": Changing aspect to " + str(new_aspect).rpartition('.')[-1] + log_message)
         # Update the current aspect - note that this dictionary element is also used by the Flash Aspects Thread
         signals.signals[str(sig_id)]["sigstate"] = new_aspect
@@ -461,7 +463,7 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
             if "slotwith" in signals.signals[other_sig_id]:
                 if signals.signals[other_sig_id]["slotwith"] == sig_id:
                     signals.update_signal_aspect(int(other_sig_id))
-    return ()
+    return(aspect_has_changed)
 
 # -------------------------------------------------------------------------
 # Internal Functions for cycling the flashing aspects. Rather than using a
@@ -637,6 +639,7 @@ class timed_sequence():
         self.time_delay = time_delay
         self.sequence_abort_flag = False
         self.sequence_in_progress = False
+        self.aspect_has_changed = False
 
     def abort(self):
         self.sequence_abort_flag = True
@@ -663,8 +666,8 @@ class timed_sequence():
                     signals.signals[str(self.sig_id)]["sigpassedcallback"] (self.sig_id)
                 else:
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
-                    update_colour_light_signal(self.sig_id)
-                    signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id)
+                    self.aspect_has_changed = update_colour_light_signal(self.sig_id)
+                    signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id, self.aspect_has_changed)
             # We only need to schedule the next YELLOW aspect for 3 and 4 aspect signals - otherwise schedule sequence completion
             if signals.signals[str(self.sig_id)]["subtype"] in (signal_subtype.three_aspect, signal_subtype.four_aspect):
                 common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_yellow())
@@ -680,8 +683,8 @@ class timed_sequence():
             # Only change the aspect and generate the callback if the same route is set
             if signals.signals[str(self.sig_id)]["routeset"] == self.sig_route:
                 logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
-                update_colour_light_signal(self.sig_id)
-                signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id)
+                self.aspect_has_changed = update_colour_light_signal(self.sig_id)
+                signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id, self.aspect_has_changed)
             # We only need to schedule the next DOUBLE YELLOW aspect for 4 aspect signals - otherwise schedule sequence completion
             if signals.signals[str(self.sig_id)]["subtype"] == signal_subtype.four_aspect:
                 common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_double_yellow())
@@ -697,8 +700,8 @@ class timed_sequence():
             # Only change the aspect and generate the callback if the same route is set
             if signals.signals[str(self.sig_id)]["routeset"] == self.sig_route:
                 logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
-                update_colour_light_signal(self.sig_id)
-                signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id)
+                self.aspect_has_changed = update_colour_light_signal(self.sig_id)
+                signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id, self.aspect_has_changed)
             # Schedule the next aspect change (which will be the sequence completion)
             common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
     
@@ -709,8 +712,8 @@ class timed_sequence():
             # Only change the aspect and generate the callback if the same route is set
             if signals.signals[str(self.sig_id)]["routeset"] == self.sig_route:
                 logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
-                update_colour_light_signal(self.sig_id)
-                signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id)
+                self.aspect_has_changed = update_colour_light_signal(self.sig_id)
+                signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id, self.aspect_has_changed)
 
 # -------------------------------------------------------------------------
 # Function to initiate a timed signal sequence - setting the signal to RED and then

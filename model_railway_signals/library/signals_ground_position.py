@@ -185,7 +185,8 @@ def update_ground_position_signal(sig_id:int):
     # Only refresh the signal if the aspect has been changed. Note that signals are created with
     # a 'sigstate' of None - so there will always be a change of state on creation to ensure
     # MQTT/DCC messages are sent out to reflect the post-creation state of the signal.
-    if aspect_to_set != signals.signals[str(sig_id)]["sigstate"]:
+    aspect_has_changed = aspect_to_set != signals.signals[str(sig_id)]["sigstate"]
+    if aspect_has_changed:
         logging.info("Signal "+str(sig_id)+": Changing aspect to " + str(aspect_to_set).rpartition('.')[-1] + log_message)
         signals.signals[str(sig_id)]["sigstate"] = aspect_to_set
         if signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.PROCEED:
@@ -210,6 +211,6 @@ def update_ground_position_signal(sig_id:int):
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
         signals.send_mqtt_signal_updated_event(sig_id)            
-    return()
+    return(aspect_has_changed)
 
 ###############################################################################

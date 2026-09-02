@@ -493,7 +493,8 @@ def update_semaphore_subsidary_arms(sig_id:int, log_message:str=""):
     else:
         new_state=None
     # Update the displayed aspect if there has been a change
-    if new_state != old_state:
+    aspect_has_changed = new_state != old_state
+    if aspect_has_changed:
         if new_state == signals.signal_state_type.DANGER:
             update_signal_arm(sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
             update_signal_arm(sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
@@ -550,7 +551,7 @@ def update_semaphore_subsidary_arms(sig_id:int, log_message:str=""):
         if signals.signals[str(sig_id)]["subsidarytheatre"]:
             signals.enable_disable_theatre_route_indication(sig_id, sig_at_danger=sig_at_danger)
         signals.signals[str(sig_id)]["substate"] = new_state
-    return ()
+    return(aspect_has_changed)
 
 # -------------------------------------------------------------------------
 # Internal Function to update each of the Main signal arms supported by
@@ -700,7 +701,8 @@ def update_semaphore_signal(sig_id:int):
             log_message = (" (PROCEED) - signal is OFF - route is set to " +
                  str(signals.signals[str(sig_id)]["routeset"]).rpartition('.')[-1])
     # Now refresh the displayed aspect (passing in the log message to be displayed) if the aspect has changed
-    if new_aspect != current_aspect:
+    aspect_has_changed = new_aspect != current_aspect
+    if aspect_has_changed:
         signals.signals[str(sig_id)]["sigstate"] = new_aspect
         update_main_signal_arms(sig_id, log_message)
         # If this signal is an associated with another signal then we also need to refresh the other signal
@@ -720,7 +722,7 @@ def update_semaphore_signal(sig_id:int):
             if "slotwith" in signals.signals[other_sig_id]:
                 if signals.signals[other_sig_id]["slotwith"] == sig_id:
                     signals.update_signal_aspect(int(other_sig_id))
-    return()
+    return(aspect_has_changed)
 
 # -------------------------------------------------------------------------
 # Function to set (and update) the route indication for the signal
@@ -765,6 +767,7 @@ class timed_sequence():
         self.time_delay = time_delay
         self.sequence_abort_flag = False
         self.sequence_in_progress = False
+        self.aspect_has_changed = False
 
     def abort(self):
         self.sequence_abort_flag = True
@@ -789,7 +792,7 @@ class timed_sequence():
                     update_semaphore_signal(self.sig_id)
                 else:
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
-                    update_semaphore_signal(self.sig_id)
+                    self.aspect_has_changed = update_semaphore_signal(self.sig_id, self.aspect_has_changed)
                     signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id)
             # We need to schedule the sequence completion (i.e. back to clear)
             common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
@@ -799,8 +802,8 @@ class timed_sequence():
         self.sequence_in_progress = False
         if signals.signal_exists(self.sig_id):
             logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
-            update_semaphore_signal(self.sig_id)
-            signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id)
+            self.aspect_has_changed = update_semaphore_signal(self.sig_id)
+            signals.signals[str(self.sig_id)]["sigupdatedcallback"] (self.sig_id, self.aspect_has_changed)
 
 # -------------------------------------------------------------------------
 # Function to initiate a timed signal sequence - setting the signal initially to ON

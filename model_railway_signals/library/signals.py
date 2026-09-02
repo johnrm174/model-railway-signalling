@@ -155,6 +155,8 @@
 #   update_signal_aspect(sig_id:int, sig_ahead:int/str) - to update the main signal aspect taking
 #                 into account the internal state of the signal and displayed aspect of the signal ahead
 #
+#   update_subsidary_aspect(sig_id:int) - to update the subsidary signal aspect
+#
 #   update_signal_styles - Update the general styles of a signal
 #     Mandatory Parameters:
 #       sig_id:int - The ID for the signal - also displayed on the signal button
@@ -535,9 +537,11 @@ def create_common_signal_elements(canvas, sig_id:int,signal_type:signal_type, x:
     signals[str(sig_id)]["routeset"]            = route_type.MAIN        # MANDATORY - Route setting for signal (MAIN at creation)
     signals[str(sig_id)]["sigclear"]            = False                  # MANDATORY - State of the main signal control (ON/OFF)
     signals[str(sig_id)]["override"]            = False                  # MANDATORY - Signal is "Overridden" to most restrictive aspect
+    signals[str(sig_id)]["override3"]           = False                  # MANDATORY - Signal is "Overridden" to most restrictive aspect
     signals[str(sig_id)]["override2"]           = False                  # MANDATORY - Signal is "Overridden" to most restrictive aspect
     signals[str(sig_id)]["overridesub"]         = False                  # MANDATORY - Subsidary is "Overridden" to most restrictive aspect
     signals[str(sig_id)]["overridesub2"]        = False                  # MANDATORY - Subsidary is "Overridden" to most restrictive aspect
+    signals[str(sig_id)]["overridesub3"]        = False                  # MANDATORY - Subsidary is "Overridden" to most restrictive aspect
     signals[str(sig_id)]["overcaution"]         = False                  # MANDATORY - Signal is "Overridden" to CAUTION
     signals[str(sig_id)]["sigstate"]            = None                   # MANDATORY - Displayed 'aspect' of the signal (None on creation)
     signals[str(sig_id)]["substate"]            = None                   # MANDATORY - Displayed 'aspect' of the subsidiary (None on creation)
@@ -707,6 +711,7 @@ def enable_disable_theatre_route_indication(sig_id:int, sig_at_danger:bool):
 
 def update_signal_aspect(sig_id:int, sig_ahead_id:Union[int,str]=None):
     # Validate the parameters we have been given as this is a library API function
+    aspect_has_changed = False
     if not isinstance(sig_id, int):
         logging.error("Signal "+str(sig_id)+": update_signal_aspect - Signal ID must be an int")
     elif sig_ahead_id is not None and not isinstance(sig_ahead_id, str) and not isinstance(sig_ahead_id, int):
@@ -719,22 +724,29 @@ def update_signal_aspect(sig_id:int, sig_ahead_id:Union[int,str]=None):
         logging.error ("Signal "+str(sig_id)+": update_signal_aspect - Signal ahead "+str(sig_ahead_id)+" is the same ID")
     # Call the signal type-specific functions to signals.
     elif signals[str(sig_id)]["sigtype"] == signal_type.ground_position:
-        signals_ground_position.update_ground_position_signal(sig_id)
+        aspect_has_changed = signals_ground_position.update_ground_position_signal(sig_id)
     elif signals[str(sig_id)]["sigtype"] == signal_type.semaphore:
-        signals_semaphores.update_semaphore_signal(sig_id)
+        aspect_has_changed = signals_semaphores.update_semaphore_signal(sig_id)
     elif signals[str(sig_id)]["sigtype"] == signal_type.ground_disc:
-        signals_ground_disc.update_ground_disc_signal(sig_id)
+        aspect_has_changed = signals_ground_disc.update_ground_disc_signal(sig_id)
     elif signals[str(sig_id)]["sigtype"] == signal_type.colour_light:
-        signals_colour_lights.update_colour_light_signal(sig_id, sig_ahead_id)
-    return()
+        aspect_has_changed = signals_colour_lights.update_colour_light_signal(sig_id, sig_ahead_id)
+    return(aspect_has_changed)
 
 def update_subsidary_aspect(sig_id:int):
-    # Call the signal type-specific functions to update the signal
-    if signals[str(sig_id)]["sigtype"] == signal_type.colour_light:
-        signals_colour_lights.update_colour_light_subsidary(sig_id)
+    # Validate the parameters we have been given as this is a library API function
+    aspect_has_changed = False
+    if not isinstance(sig_id, int):
+        logging.error("Signal "+str(sig_id)+": update_subsidary_aspect - Signal ID must be an int")
+    elif not signal_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": update_subsidary_aspect - Signal does not exist")
+    elif not signals[str(sig_id)]["hassubsidary"]:
+        logging.error("Signal "+str(sig_id)+": update_subsidary_aspect - Signal does not have a subsidary")
+    elif signals[str(sig_id)]["sigtype"] == signal_type.colour_light:
+        aspect_has_changed = signals_colour_lights.update_colour_light_subsidary(sig_id)
     elif signals[str(sig_id)]["sigtype"] == signal_type.semaphore:
-        signals_semaphores.update_semaphore_subsidary_arms(sig_id)
-    return()
+        aspect_has_changed = signals_semaphores.update_semaphore_subsidary_arms(sig_id)
+    return(aspect_has_changed)
 
 # ------------------------------------------------------------------------------------------
 # API function for updating the ID of the signal to be 'slot' the ground signal with. This
@@ -816,14 +828,12 @@ def toggle_subsidary(sig_id:int):
             signals[str(sig_id)]["subclear"] = False
             signals[str(sig_id)]["subbutton"].config(relief="raised")
             signals[str(sig_id)]["subbutton"].config(background=signals[str(sig_id)]["deselectedcolour"])
-            update_subsidary_aspect(sig_id)
         else:
             logging.info ("Signal "+str(sig_id)+": Toggling subsidary to OFF")
             signals[str(sig_id)]["subclear"] = True
             signals[str(sig_id)]["subbutton"].config(relief="sunken")
             signals[str(sig_id)]["subbutton"].config(background=signals[str(sig_id)]["selectedcolour"])
-            update_subsidary_aspect(sig_id)
-    return ()
+    return()
 
 # -------------------------------------------------------------------------
 # Library API function to Set the approach control mode for a signal (supported
@@ -911,7 +921,7 @@ def clear_approach_control(sig_id:int):
 # occupancy changes are processed (after the clearance delay) 
 # -------------------------------------------------------------------------
 
-def set_signal_override(sig_id:int, temp_override:bool=False):
+def set_signal_override(sig_id:int, temp_override:bool=False, secondary_override:bool=False):
     global signals
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
@@ -922,14 +932,17 @@ def set_signal_override(sig_id:int, temp_override:bool=False):
         if temp_override and not signals[str(sig_id)]["override2"]:
             logging.info("Signal "+str(sig_id)+": Setting temp signal override")
             signals[str(sig_id)]["override2"] = True
-        elif not temp_override and not signals[str(sig_id)]["override"]:
+        elif secondary_override and not signals[str(sig_id)]["override3"]:
+            logging.info("Signal "+str(sig_id)+": Setting secondary signal override")
+            signals[str(sig_id)]["override3"] = True
+        elif not temp_override and not secondary_override and not signals[str(sig_id)]["override"]:
             logging.info("Signal "+str(sig_id)+": Setting signal override")
             signals[str(sig_id)]["override"] = True
-        if signals[str(sig_id)]["override"] or signals[str(sig_id)]["override2"]:
-            signals[str(sig_id)]["sigbutton"].config(foreground="red", activeforeground="red")
+        # At least one override will have been set by this function so we can update the button
+        signals[str(sig_id)]["sigbutton"].config(foreground="red", activeforeground="red")
     return()
 
-def clear_signal_override(sig_id:int, temp_override:bool=False):
+def clear_signal_override(sig_id:int, temp_override:bool=False, secondary_override:bool=False):
     global signals
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
@@ -940,15 +953,19 @@ def clear_signal_override(sig_id:int, temp_override:bool=False):
         if temp_override and signals[str(sig_id)]["override2"]:
             logging.info("Signal "+str(sig_id)+": Clearing temp signal override")
             signals[str(sig_id)]["override2"] = False
-        elif not temp_override and signals[str(sig_id)]["override"]:
+        elif secondary_override and signals[str(sig_id)]["override3"]:
+            logging.info("Signal "+str(sig_id)+": Clearing secondary signal override")
+            signals[str(sig_id)]["override3"] = False
+        elif not temp_override and not secondary_override and signals[str(sig_id)]["override"]:
             logging.info("Signal "+str(sig_id)+": Clearing signal override")
             signals[str(sig_id)]["override"] = False
-        if not signals[str(sig_id)]["override"] and not signals[str(sig_id)]["override2"]:
+        # Only clear down the button override indication if no other overrides are set
+        if not signals[str(sig_id)]["override"] and not signals[str(sig_id)]["override2"] and not signals[str(sig_id)]["override3"]:
             text_colour = signals[str(sig_id)]["textcolour"]
             signals[str(sig_id)]["sigbutton"].config(foreground=text_colour, activeforeground=text_colour)
     return()
 
-def set_subsidary_override(sig_id:int, temp_override:bool=False):
+def set_subsidary_override(sig_id:int, temp_override:bool=False, secondary_override:bool=False):
     global signals
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
@@ -961,16 +978,17 @@ def set_subsidary_override(sig_id:int, temp_override:bool=False):
         if temp_override and not signals[str(sig_id)]["overridesub2"]:
             logging.info("Signal "+str(sig_id)+": Setting temp subsidiary override")
             signals[str(sig_id)]["overridesub2"] = True
-            update_subsidary_aspect(sig_id)
-        elif not temp_override and not signals[str(sig_id)]["overridesub"]:
+        elif secondary_override and not signals[str(sig_id)]["overridesub3"]:
+            logging.info("Signal "+str(sig_id)+": Setting secondary subsidiary override")
+            signals[str(sig_id)]["overridesub3"] = True
+        elif not temp_override and not secondary_override and not signals[str(sig_id)]["overridesub"]:
             logging.info("Signal "+str(sig_id)+": Setting subsidiary override")
             signals[str(sig_id)]["overridesub"] = True
-            update_subsidary_aspect(sig_id)
-        if signals[str(sig_id)]["overridesub"] or signals[str(sig_id)]["overridesub2"]:
-            signals[str(sig_id)]["subbutton"].config(foreground="red", activeforeground="red")
+        # At least one override will have been set by this function so we can update the button
+        signals[str(sig_id)]["subbutton"].config(foreground="red", activeforeground="red")
     return()
 
-def clear_subsidary_override(sig_id:int, temp_override:bool=False):
+def clear_subsidary_override(sig_id:int, temp_override:bool=False, secondary_override:bool=False):
     global signals
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
@@ -983,12 +1001,14 @@ def clear_subsidary_override(sig_id:int, temp_override:bool=False):
         if temp_override and signals[str(sig_id)]["overridesub2"]:
             logging.info("Signal "+str(sig_id)+": Clearing temp subsidiary override")
             signals[str(sig_id)]["overridesub2"] = False
-            update_subsidary_aspect(sig_id)
+        elif secondary_override and signals[str(sig_id)]["overridesub3"]:
+            logging.info("Signal "+str(sig_id)+": Clearing temp subsidiary override")
+            signals[str(sig_id)]["overridesub3"] = False
         elif not temp_override and signals[str(sig_id)]["overridesub"]:
             logging.info("Signal "+str(sig_id)+": Clearing subsidiary override")
             signals[str(sig_id)]["overridesub"] = False
-            update_subsidary_aspect(sig_id)
-        if not signals[str(sig_id)]["overridesub"] and not signals[str(sig_id)]["overridesub2"]:
+        # Only clear down the button override indication if no other overrides are set
+        if not signals[str(sig_id)]["overridesub"] and not signals[str(sig_id)]["overridesub2"] and not signals[str(sig_id)]["overridesub3"]:
             text_colour = signals[str(sig_id)]["textcolour"]
             signals[str(sig_id)]["subbutton"].config(foreground=text_colour, activeforeground=text_colour)
     return()
@@ -1367,8 +1387,9 @@ def handle_mqtt_signal_updated_event(message:dict):
         logging.info("Signal "+signal_identifier+": State update from remote signal *****************************")
         logging.info ("Signal "+signal_identifier+": Aspect has changed to : "+
                             str(signals[signal_identifier]["sigstate"]).rpartition('.')[-1])
-        # Make the external callback (if one has been defined)
-        signals[signal_identifier]["sigupdatedcallback"] (signal_identifier)
+        # Make the external callback (if one has been defined). Note that mqtt signal updated events
+        # are only sent if the signal aspect has been changed, so 'updated' is always True
+        signals[signal_identifier]["sigupdatedcallback"] (signal_identifier, True)
     return()
 
 #---------------------------------------------------------------------------------------------
