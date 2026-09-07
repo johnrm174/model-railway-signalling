@@ -116,15 +116,10 @@ def configure_spad_popups(popups:bool):
 #     return(route)
 
 #------------------------------------------------------------------------------------
-#####################################
-# Helper function to find the distant signal on the route behind the specified home
-# signal. Will return the Signal ID of the distant signal if one is found (else None).
-# This is used following a signal_updated callback to find any distant signals that may
-# may need to be interlocked with the new state of the signal (if the updated signal
-# was a home signal ahead of the distant signal). Also used following the override of
-# any local signals (case of Distant signals being overridden by home signals ahead)
-# Note that that we stop as soon as we find a signal ID we have already seen to prevent
-# infinite recursion on circular layouts.
+# Helper function to find the signal on the route behind the specified signal. The
+# function handles both local and remote IDs. If its a local ID then we just get the
+# signal behind from the runtime data cache. If its a remote signal, then we have to
+# iterate through all local signals to find a match against the signal ahead.
 #------------------------------------------------------------------------------------
 
 def find_signal_behind(str_signal_id):
@@ -135,28 +130,98 @@ def find_signal_behind(str_signal_id):
     else:
         # Its a remote signal - we have to iterate through all local signals to find a 
         # match for the signal ahead and assume the remote signal is a home signal
-        str_signal_behind_id = None
         for str_sig_to_test_id, str_sig_ahead_to_match_id in run_common.signal_str_signal_ahead.items():
             if str_sig_ahead_to_match_id == str_signal_id:
                 str_signal_behind_id = str_sig_to_test_id
                 break
     return(str_signal_behind_id)
 
-def find_distant_signal_behind(str_signal_id:str, list_of_signal_ids_already_seen:list=None):
+#------------------------------------------------------------------------------------
+# Helper function to find the distant signal on the route behind the specified signal
+# Will return the Signal ID of the distant signal if one is found (else None). This
+# is used following a signal_updated callback to find any distant signals that are
+# configured to be interlocked with home signals on the route ahead. We stop when we
+# either find a distant signal,  find a signal that is not a home or distant signal
+# (which means there is no distant on the route behind that will be affected by the
+# change) or find a signal we have already seen (to guard against infinite recursion)
+#------------------------------------------------------------------------------------
+
+def find_distant_signal_behind_home_signals(str_signal_id:str, list_of_signal_ids_already_seen:list=None):
+    str_dist_signal_id = None
+    # Reset the list of signals seen if called for the first time
     if list_of_signal_ids_already_seen is None:
         list_of_signal_ids_already_seen = []
-    # Find the signal behind ID (works for local and remote signals)
-    str_signal_behind_id = find_signal_behind(str_signal_id)
-    # We only care about distant signals behind home signals       
-    if str_signal_behind_id:
-        if str_signal_behind_id in list_of_signal_ids_already_seen:
-            str_signal_behind_id = None
+    # We only go on to test the signal behind if this is a home signal
+    if run_common.signal_is_home_signal[str_signal_id]:
+        # Find the signal behind ID (works for local and remote signals)
+        str_signal_behind_id = find_signal_behind(str_signal_id)
+        # Only continue if there is a signal behind and we haven't seen it before       
+        if str_signal_behind_id and str_signal_behind_id not in list_of_signal_ids_already_seen:
+            list_of_signal_ids_already_seen.append(str_signal_behind_id)
+            if run_common.signal_is_dist_signal[str_signal_behind_id]
+                str_dist_signal_id = str_signal_behind_id
+            elif run_common.signal_has_dist_arms[str_signal_behind_id]
+                str_dist_signal_id = str(int(str_signal_behind_id)+1000)
+            else:
+                str_dist_signal_id = find_distant_signal_behind_home_signals(str_signal_behind_id, list_of_signal_ids_already_seen)
+    return(str_dist_signal_id)
+
+#------------------------------------------------------------------------------------
+# Internal Function to walk the route ahead of a distant signal to see if any
+# signals are at DANGER (will return True as soon as this is the case). The 
+# forward search will be aborted as soon as a "non-home" signal type is found
+# (this includes the case where a home semaphore also has secondary distant arms)
+# The forward search will also be aborted if the signal ahead is a remote signal
+# on the assumption that the remote signal is in the next block section and
+# should therefore be the distant signal protecting that block section.
+# A maximum recursion depth provides a level of protection from mis-configuration
+# Note the function should only be called for local signals (sig ID is an integer)
+#------------------------------------------------------------------------------------
+
+def find_home_signal_ahead_at_danger(str_signal_id:str, list_of_signal_ids_already_seen:list=None):
+    home_signal_ahead_at_danger = True
+    # Reset the list of signals seen if called for the first time
+    if list_of_signal_ids_already_seen is None:
+        list_of_signal_ids_already_seen = []
+    # Find the signal ahead ID (works for local and remote signals)
+    str_signal_ahead_id = signal_str_signal_ahead[str_signal_id]
+    # Only continue if there is a signal ahead and we haven't seen it before       
+    if str_signal_ahead_id and str_signal_ahead_id not in list_of_signal_ids_already_seen:
+        list_of_signal_ids_already_seen.append(str_signal_behind_id)
+        is_home_signal = run_common.signal_is_home_signal[str_signal_ahead_id]
+        signal_state = library.signal_state(int(str_signal_ahead_id)
+        if is_home_signal and signal_state == library.signal_state_type.DANGER:
+            str_dist_signal_id = str_signal_behind_id
+        elif run_common.signal_has_dist_arms[str_signal_behind_id]
+            str_dist_signal_id = str(int(str_signal_behind_id)+1000)
         else:
-            signal_is_dist_signal = run_common.signal_is_dist_signal[str_signal_behind_id]
-            if not signal_is_dist_signal:
-                list_of_signal_ids_already_seen.append(str_signal_behind_id)
-                str_signal_behind_id = find_distant_signal_behind(str_signal_behind_id, list_of_signal_ids_already_seen)
-    return(str_signal_behind_id)
+            str_dist_signal_id = find_distant_signal_behind_home_signals(str_signal_behind_id, list_of_signal_ids_already_seen)
+
+#------------------------------------------------------------------------------------
+# Functiomn to either set or clear
+#------------------------------------------------------------------------------------
+
+def update_signal_approach_control(str_signal_id:str, force_set:bool=False):
+    # Set/Clear approach control for the signal only if supported
+    if run_common.signal_supports_approach_control[str_signal_behind_id]:
+        signal_route = run_common.signal_valid_route_ahead[str_signal_behind_id]
+        if signal_route is not None:
+            # The "approachcontrol" element is a list of routes [Main, Lh1, Lh2, Rh1, Rh2]
+            # Each element represents the approach control mode that has been set
+            # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
+            if not library.signal_clear(int_signal_behind_id):
+                library.clear_approach_control(int_signal_behind_id)
+            elif signal_object["approachcontrol"][signal_route] == 1:
+                library.set_approach_control(int_signal_behind_id, release_on_yellow=False, force_set=force_set)
+            elif signal_object["approachcontrol"][signal_route] == 2:
+                library.set_approach_control(int_signal_behind_id, release_on_yellow=True, force_set=force_set)
+            elif signal_object["approachcontrol"][signal_route] == 3 and home_signal_ahead_at_danger:
+                library.set_approach_control(int_signal_behind_id, release_on_yellow=False, force_set=force_set)
+            else:
+                library.clear_approach_control(int_signal_behind_id)
+        else:
+            library.clear_approach_control(int_signal_behind_id)
+    return()
 
 #------------------------------------------------------------------------------------
 # Internal function to find any colour light signals which are configured to update aspects
@@ -188,25 +253,7 @@ def update_signal_behind(str_signal_id:str, home_signal_ahead_at_danger:bool=Fal
         list_of_signal_ids_already_seen.append(str_signal_behind_id)
         signal_object = objects.schematic_objects[objects.signal(str_signal_behind_id)]
 
-        # Set/Clear approach control for the signal
-        if run_common.signal_supports_approach_control[str_signal_behind_id]:
-            signal_route = run_common.signal_valid_route_ahead[str_signal_behind_id]
-            if signal_route is not None:
-                # The "approachcontrol" element is a list of routes [Main, Lh1, Lh2, Rh1, Rh2]
-                # Each element represents the approach control mode that has been set
-                # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
-                if not library.signal_clear(int_signal_behind_id):
-                    library.clear_approach_control(int_signal_behind_id)
-                elif signal_object["approachcontrol"][signal_route] == 1:
-                    library.set_approach_control(int_signal_behind_id, release_on_yellow=False)
-                elif signal_object["approachcontrol"][signal_route] == 2:
-                    library.set_approach_control(int_signal_behind_id, release_on_yellow=True)
-                elif signal_object["approachcontrol"][signal_route] == 3 and home_signal_ahead_at_danger:
-                    library.set_approach_control(int_signal_behind_id, release_on_yellow=False)
-                else:
-                    library.clear_approach_control(int_signal_behind_id)
-            else:
-                library.clear_approach_control(int_signal_behind_id)
+
         # Update the signal behind based on the displayed aspect of this signal
         update_displayed_aspect(int_signal_behind_id, str_signal_id)
         # carry on back down the route

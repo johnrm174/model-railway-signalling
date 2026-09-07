@@ -735,6 +735,8 @@ def point_switched_callback(int_point_id:int, route_id:int=0):
     run_layout.process_signal_interlocking(signals_to_check = signals_to_check)
     # Any change in the state of a point could invalidate a route
     run_routes.check_routes_valid_after_point_change(int_point_id, route_id)
+    # Only a signal change or a route change can affect the approach control
+    # status of a signal
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
@@ -752,6 +754,7 @@ def fpl_switched_callback(int_point_id:int, route_id:int=0):
     run_layout.process_signal_interlocking(signals_to_check = signals_to_check)
     # Any change in the state of a point could invalidate a route
     run_routes.check_routes_valid_after_point_change(int_point_id, route_id)
+    # A point change cannot affect approach control so we don't update it
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
@@ -766,18 +769,11 @@ def signal_updated_callback(signal_id:Union[int,str], aspect_has_changed:bool):
         start_time = time.time()
     # Distant signals can be interlocked with Home signals ahead at DANGER so any change to the
     # displayed aspect of a signal could affect the interlocking of any distant signals behind
-    run_layout.process_signal_interlocking(signals_to_check = signals_to_check)
-    # Distant signals can be interlocked with Home signals ahead (locked ON) and overridden
-    # (to Caution) if any Home signals on the route ahead are displaying DANGER. To minimise
-    # Processing we walk the route behind this signal to find the previous distant signal
-    distant_signals_to_check = [find_distant_signal_behind_home_signal(str(signal_id))]
-    
-    if run_mode and automation_enabled:
-        run_layout.update_approach_control_status_for_all_signals() ####################################################
-        run_layout.override_distant_signals_based_on_signals_ahead() ###################################################
-    else:
-        run_layout.process_signal_aspect_update(str(signal_id))
-        signal_str_dist_signal_behind[str_signal_id] ###################################################################
+    distant_signal_to_check = find_distant_signal_behind_home_signal(str(signal_id))
+    run_layout.process_signal_interlocking(signals_to_check = [distant_signals_to_check])
+    # Update the state of this signal plus all signals behind (including any distant signals
+    # behind which are configured to be "overridden" by home signals ahead at danger)
+    run_layout.process_signal_aspect_update(str(signal_id))
     run_routes.enable_disable_schematic_routes()   ################???????????????????????##############################
     if enhanced_debugging:
         time_in_ms = '%.3f'%((time.time()-start_time)*1000)
