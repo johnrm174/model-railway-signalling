@@ -841,7 +841,7 @@ def toggle_subsidary(sig_id:int):
 # against signal types/subtypes depending on the approach control mode being set
 # -------------------------------------------------------------------------
 
-def set_approach_control(sig_id:int, release_on_yellow:bool=False, force_set:bool=True):
+def set_approach_control(sig_id:int, release_on_yellow:bool=False, release_on_red:bool=False, force_set:bool=True):
     global signals
     function_call_valid = False
     # Validate the parameters we have been given as this is a library API function
@@ -876,7 +876,7 @@ def set_approach_control(sig_id:int, release_on_yellow:bool=False, force_set:boo
             logging.info("Signal "+str(sig_id)+": Setting approach control (release on yellow)")
             signals[str(sig_id)]["releaseonyel"] = True
             signals[str(sig_id)]["releaseonred"] = False
-        elif not release_on_yellow and not signals[str(sig_id)]["releaseonred"]:
+        elif release_on_red and not signals[str(sig_id)]["releaseonred"]:
             logging.info("Signal "+str(sig_id)+": Setting approach control (release on red)")
             signals[str(sig_id)]["releaseonred"] = True
             signals[str(sig_id)]["releaseonyel"] = False
