@@ -412,14 +412,24 @@ def rotate_line(ox,oy,px1,py1,px2,py2,angle):
 #-------------------------------------------------------------------------
 
 def process_external_events():
-    while not event_queue.empty():
-        try:
-            callback = event_queue.get_nowait()
-            callback()
-        except Exception as exception:
-            logging.error(f"Exception processing event in Tkinter Thread: {exception}")
-    root_window.after(10, process_external_events)
-    return()
+    try:
+        while True:
+            try:
+                callback = event_queue.get_nowait()
+            except queue.Empty:
+                break
+            try:
+                callback()
+            except Exception:
+                logging.exception("Exception processing event in tkinter thread: %r", callback)
+            finally:
+                event_queue.task_done()
+    except Exception:
+        # Protect the polling function itself from unexpected errors
+        logging.exception("Unexpected error in process_external_events")
+    finally:
+        # Always schedule the next poll, even if a callback failed
+        root_window.after(10, process_external_events)
 
 def execute_function_in_tkinter_thread(callback_function):
     event_queue.put(callback_function)
