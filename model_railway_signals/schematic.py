@@ -1206,7 +1206,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
     library.initialise(root_window, canvas)
     # Create the common tkinter event bindings (applicable to all modes)
     create_common_event_bindings()
-    return()
+    return(canvas)
 
 # The following shutdown function is to overcome what seems to be a bug in TkInter where
 # (I think) Tkinter is trying to destroy the photo-image objects after closure of the

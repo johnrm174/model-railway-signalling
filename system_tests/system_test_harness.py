@@ -339,7 +339,7 @@ def start_application(callback_function):
     main_menubar = editor.main_menubar(root)
     # Use the signals Lib function to find/store the root window reference
     # And then re-bind the close window event to the editor quit function
-    common.set_root_window(root)
+    common.initialise(root, main_menubar.canvas)
     root.protocol("WM_DELETE_WINDOW", main_menubar.quit_schematic)
     # Start the test harness thread
     test_thread = threading.Thread (target=lambda:test_harness_thread(callback_function))
@@ -397,8 +397,10 @@ def run_function(test_function, timeout=2.0):
 
 def raise_test_error(message):
     global test_failures
-    caller = getframeinfo(stack()[2][0])
-    logging.error("Line %d of %s: %s" % (caller.lineno,basename(caller.filename),message))     
+    caller1 = getframeinfo(stack()[2][0])
+    caller2 = getframeinfo(stack()[3][0])
+    logging.error("Line %d of %s: %s" % (caller1.lineno,basename(caller1.filename),message))
+    logging.error("                   Called from Line %d of %s" % (caller2.lineno, basename(caller2.filename)))
     test_failures = test_failures+1
 
 def raise_test_warning(message):
@@ -662,15 +664,20 @@ def click_telegraph_key(*instrumentids):
 def simulate_gpio_triggered(*gpioids):
     def dummy_function(): pass
     for gpioid in gpioids:
-        if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
+        gpio_port_mapping = gpio_sensors.gpio_port_mappings.get(str(gpioid))
+        if gpio_port_mapping is None:
             raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
-            run_function(lambda:gpio_sensors.gpio_physical_trigger_callback(gpioid))
-            # Wait 30ms (default GPIO sensor debounce delay = 20ms
-            time.sleep(0.030)
-            run_function(lambda:gpio_sensors.gpio_physical_release_callback(gpioid))
-            # Wait for the event loop to come round again, so we are sure any secondary events have finished
-            run_function(lambda:dummy_function())
+            run_function(lambda: gpio_sensors.gpio_physical_trigger_callback(gpioid))
+            # The event is set by the validation thread before the resulting
+            # GPIO callback is queued on the Tkinter thread. Drain that callback
+            # before issuing the physical release.
+            run_function(lambda: dummy_function())
+            run_function(lambda: gpio_sensors.gpio_physical_release_callback(gpioid))
+            # Allow the release callback and any resulting events to complete.
+            run_function(lambda: dummy_function())
+            # We need this sleep - TECH DEBT to remove at some stage
+            time.sleep(0.1)
 
 def simulate_gpio_on(*gpioids):
     for gpioid in gpioids:

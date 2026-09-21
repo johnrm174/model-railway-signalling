@@ -277,7 +277,7 @@ class main_menubar:
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
         # Initialise the schematic module - this will initialise the objects, library and run_layout modules
-        schematic.initialise(self.root, self.handle_canvas_event,
+        self.canvas = schematic.initialise(self.root, self.handle_canvas_event,
                              width=settings.get_canvas("width"),
                              height=settings.get_canvas("height"),
                              grid=settings.get_canvas("grid"),
@@ -767,7 +767,6 @@ class main_menubar:
     #------------------------------------------------------------------------------------------
 
     def export_to_image(self):
-        canvas = schematic.canvas
         # Open the Save As dialog
         launch_dir = os.getcwd()
         output_filepath = Tk.filedialog.asksaveasfilename(initialdir=launch_dir,
@@ -775,30 +774,30 @@ class main_menubar:
         # Handle output_filepath or empty selection
         if not output_filepath: return None
         # Store original scroll positions to restore later
-        original_x_position_fraction = canvas.xview()[0]
-        original_y_position_fraction = canvas.yview()[0]
+        original_x_position_fraction = self.canvas.xview()[0]
+        original_y_position_fraction = self.canvas.yview()[0]
         # Ensure all pending visual drawing tasks are completed by Tkinter
-        canvas.update_idletasks()
+        self.canvas.update_idletasks()
         # Retrieve overall scroll region set on canvas, or fall back to item bounds
-        scroll_region = canvas.cget("scrollregion")
+        scroll_region = self.canvas.cget("scrollregion")
         if scroll_region:
             scroll_coordinates = [int(value) for value in scroll_region.split()]
             canvas_total_width = scroll_coordinates[2] - scroll_coordinates[0]
             canvas_total_height = scroll_coordinates[3] - scroll_coordinates[1]
         else:
-            bounding_box = canvas.bbox("all")
+            bounding_box = self.canvas.bbox("all")
             if bounding_box is None:
                 logging.warning("Canvas has no content or defined scrollregion. Export aborted.")
                 return None
             canvas_total_width = bounding_box[2]
             canvas_total_height = bounding_box[3]
         # Fetch outer border thickness to strip dark border lines from tiles
-        border_width = int(canvas.cget("bd"))
-        highlight_width = int(canvas.cget("highlightthickness"))
+        border_width = int(self.canvas.cget("bd"))
+        highlight_width = int(self.canvas.cget("highlightthickness"))
         total_border_offset = border_width + highlight_width
         # Get true internal drawing region width and height
-        viewport_width = canvas.winfo_width() - (total_border_offset * 2)
-        viewport_height = canvas.winfo_height() - (total_border_offset * 2)
+        viewport_width = self.canvas.winfo_width() - (total_border_offset * 2)
+        viewport_height = self.canvas.winfo_height() - (total_border_offset * 2)
         # Log initial operational parameters
         logging.debug("Reported total canvas size: %dx%d pixels", canvas_total_width, canvas_total_height)
         logging.debug("Reported visible viewport size: %dx%d pixels", viewport_width, viewport_height)
@@ -811,22 +810,22 @@ class main_menubar:
         while current_pixel_y < canvas_total_height:
             # Calculate vertical scroll percentage (float between 0.0 and 1.0)
             y_scroll_fraction = current_pixel_y / float(canvas_total_width if canvas_total_height == 0 else canvas_total_height)
-            canvas.yview_moveto(y_scroll_fraction)
+            self.canvas.yview_moveto(y_scroll_fraction)
             current_pixel_x = 0
             matrix_column_index = 0
             while current_pixel_x < canvas_total_width:
                 # Calculate horizontal scroll percentage
                 x_scroll_fraction = current_pixel_x / float(canvas_total_width)
-                canvas.xview_moveto(x_scroll_fraction)
+                self.canvas.xview_moveto(x_scroll_fraction)
                 # Process UI updates and wait for the Pi's window manager to redraw
-                canvas.update()
+                self.canvas.update()
                 time.sleep(0.12)  # Slower delay suited for Raspberry Pi rendering
                 # Read back true top-left canvas coordinate from Tkinter to handle boundary clamping
-                actual_canvas_pixel_x = int(canvas.canvasx(0))
-                actual_canvas_pixel_y = int(canvas.canvasy(0))
+                actual_canvas_pixel_x = int(self.canvas.canvasx(0))
+                actual_canvas_pixel_y = int(self.canvas.canvasy(0))
                 # Absolute screen position of inner canvas drawing area (offsetting outer borders)
-                canvas_screen_x = canvas.winfo_rootx() + total_border_offset
-                canvas_screen_y = canvas.winfo_rooty() + total_border_offset
+                canvas_screen_x = self.canvas.winfo_rootx() + total_border_offset
+                canvas_screen_y = self.canvas.winfo_rooty() + total_border_offset
                 # Calculate screen bounding box for ImageGrab
                 screen_left = canvas_screen_x
                 screen_top = canvas_screen_y
@@ -852,9 +851,9 @@ class main_menubar:
             matrix_row_index = matrix_row_index + 1
             current_pixel_y = current_pixel_y + viewport_height
         # Restore user's original scroll view
-        canvas.xview_moveto(original_x_position_fraction)
-        canvas.yview_moveto(original_y_position_fraction)
-        canvas.update()
+        self.canvas.xview_moveto(original_x_position_fraction)
+        self.canvas.yview_moveto(original_y_position_fraction)
+        self.canvas.update()
         # Final logging and save
         final_image_width, final_image_height = master_stitched_image.size
         logging.debug(
