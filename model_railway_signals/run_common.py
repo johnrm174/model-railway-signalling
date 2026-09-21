@@ -592,11 +592,13 @@ def refresh_signal_routing_data_runtime_caches(signals_to_update:list[str], clea
                 signal_approach_control_on_yellow[str_signal_id] = (approach_control_mode_for_route == 2)
                 signal_approach_control_for_route[str_signal_id] = (approach_control_mode_for_route == 3)
             # The signal arms table table comprises a list of route definitions: [MAIN,LH1,LH2,RH1,RH2]
-            # Note that semaphores only support 5 routes in terms of signal arm indications 
+            # Note that semaphores only support 5 routes in terms of signal arm indications (hence the mapping) 
             # Each Route definition comprises a list of signal arm definitions [main-arm, sub-arm, distarm]
             # Each signal arm definition comprises [has-arm:bool, dcc_address:int]
+            sig_route_to_arm_mapping = [0, 1, 2, 2, 3, 4, 4]
+            sig_arm_index = sig_route_to_arm_mapping[signal_route.value-1]
             signal_arm_definitions = signal_object["sigarms"]
-            signal_arm_definitions_for_route = signal_arm_definitions[signal_route.value-1]
+            signal_arm_definitions_for_route = signal_arm_definitions[sig_arm_index]
             dist_sig_arm_definition_for_route = signal_arm_definitions_for_route[2]
             has_dist_arm_for_route = dist_sig_arm_definition_for_route[0] 
             signal_has_dist_arm_for_route[str_signal_id] = has_dist_arm_for_route
@@ -770,7 +772,7 @@ def reset_layout(switch_delay:int=0):
 def point_switched_callback(int_point_id:int, int_route_id:int=0):
     if enhanced_debugging:
         logging.debug("############################## point_switched_callback "+str(int_point_id))
-        start_time = time.time()
+        start_time = time.perf_counter()
     str_point_id = str(int_point_id)
     str_route_id = str(int_route_id)
     # Synchronise any associated levers
@@ -791,14 +793,14 @@ def point_switched_callback(int_point_id:int, int_route_id:int=0):
     # and then returned to OFF after the point has been changed. We can therefore leave
     # the update of these two use cases to be processed on the signal changes.
     if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        time_in_ms = '%.3f'%((time.perf_counter()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def fpl_switched_callback(int_point_id:int, int_route_id:int=0):
     if enhanced_debugging:
         logging.debug("############################## fpl_switched_callback "+str(int_point_id))
-        start_time = time.time()
+        start_time = time.perf_counter()
     str_point_id = str(int_point_id)
     str_route_id = str(int_route_id)
     # Synchronise any associated levers
@@ -813,7 +815,7 @@ def fpl_switched_callback(int_point_id:int, int_route_id:int=0):
     # Neither "approach control on signals ahead" and "override signal on occupied track
     # sections ahead" can be affected by point fpl changes.
     if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        time_in_ms = '%.3f'%((time.perf_counter()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
@@ -823,7 +825,7 @@ def signal_updated_callback(signal_id:Union[int,str]):
     # 2) A remote signal changing (where we get notified via MQTT) - Remote ID
     if enhanced_debugging:
         logging.debug("############################## signal_updated_callback "+str(signal_id))
-        start_time = time.time()
+        start_time = time.perf_counter()
     str_signal_id = str(signal_id)
     # Update the state of this signal plus all affected signals behind. Any change to the
     # displayed aspect of a signal could affect the interlocking of distant signals behind.
@@ -832,17 +834,23 @@ def signal_updated_callback(signal_id:Union[int,str]):
 #     # Enable/disable any schematic routes affected by the signal change ############################################
 #     run_routes.enable_disable_schematic_routes() ###################################################################
     if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        time_in_ms = '%.3f'%((time.perf_counter()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def signal_switched_callback(int_signal_id:int, int_route_id:int=0):
-    start_time = time.time()
+    start_time = time.perf_counter()
     if enhanced_debugging:
         logging.debug("############################## signal_switched_callback "+str(int_signal_id))
-        start_time = time.time()
+        start_time = time.perf_counter()
     str_signal_id = str(int_signal_id)
     str_route_id = str(int_route_id)
+    # For secondary distant arms we just update any associated levers and the signal aspect
+    # These are 'slotted' with the home signal so we don't need to worry about anything else
+    if int(str_signal_id) > 1000:
+        run_layout.synchronise_levers_with_secondary_dist_arm(str_signal_id)
+        run_layout.process_signal_aspect_update(str_signal_id)
+        return()
     # Synchronise any associated levers
     run_layout.synchronise_levers_with_signal(str_signal_id)
     # Update the state of this signal plus all affected signals behind. Any change to the
@@ -860,14 +868,14 @@ def signal_switched_callback(int_signal_id:int, int_route_id:int=0):
     # Any change in the state of a signal could impact the viability of other routes
     run_routes.enable_disable_schematic_routes()
     if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        time_in_ms = '%.3f'%((time.perf_counter()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def subsidary_switched_callback(int_signal_id:int, int_route_id:int=0):
     if enhanced_debugging:
         logging.debug("############################## subsidary_switched_callback "+str(int_signal_id))
-        start_time = time.time()
+        start_time = time.perf_counter()
     str_signal_id = str(int_signal_id)
     str_route_id = str(int_route_id)
     # Synchronise any associated levers
@@ -884,14 +892,14 @@ def subsidary_switched_callback(int_signal_id:int, int_route_id:int=0):
     # Any change in the state of a subsidiary could impact the viability of other routes
     run_routes.enable_disable_schematic_routes()
     if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        time_in_ms = '%.3f'%((time.perf_counter()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def signal_passed_callback(int_signal_id:int):
     if enhanced_debugging:
         logging.debug("############################## signal_passed_callback "+str(int_signal_id))
-        start_time = time.time()
+        start_time = time.perf_counter()
     str_signal_id = str(int_signal_id)
     # Trigger any timed aspect sequences
     run_layout.trigger_timed_signal_sequence(str_signal_id)
@@ -913,14 +921,14 @@ def signal_passed_callback(int_signal_id:int):
 #     # Any change in the state of a signal could impact the viability of other routes ##############################################
 #     run_routes.enable_disable_schematic_routes() ##################################################################################
     if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        time_in_ms = '%.3f'%((time.perf_counter()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def signal_released_callback(int_signal_id:int):
     if enhanced_debugging:
         logging.debug("############################## signal_released_callback "+str(int_signal_id))
-        start_time = time.time()
+        start_time = time.perf_counter()
     str_signal_id = str(int_signal_id)
     # Update the state of this signal plus all affected signals behind. Any change to the
     # displayed aspect of a signal could affect the interlocking of distant signals behind.
@@ -929,19 +937,19 @@ def signal_released_callback(int_signal_id:int):
 #     # Any change in the state of a signal could impact the viability of other routes ##############################################
 #     run_routes.enable_disable_schematic_routes() ##################################################################################
     if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        time_in_ms = '%.3f'%((time.perf_counter()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def sensor_passed_callback(int_sensor_id:int):
     if enhanced_debugging:
         logging.debug("############################## sensor_passed_callback "+str(int_sensor_id))
-        start_time = time.time()
+        start_time = time.perf_counter()
     str_sensor_id = str(int_sensor_id)
     # Process any track occupancy changes
     affected_sections = run_layout.update_track_occupancy_for_track_sensor(str_sensor_id)
     # Track section Updates may affect the state of signals on the schematic
-    affected_signals = [str_signal_id]
+    affected_signals = []
     for affected_section in affected_sections:
         affected_signals.extend(section_linked_signals[affected_section])
     affected_signals = list(set(affected_signals))
@@ -955,18 +963,18 @@ def sensor_passed_callback(int_sensor_id:int):
     run_routes.trigger_routes_after_sensor_passed(str_sensor_id)
 #     run_routes.enable_disable_schematic_routes() #################################################################################
     if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        time_in_ms = '%.3f'%((time.perf_counter()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
         
 def section_updated_callback(int_section_id:int):
     if enhanced_debugging:
         logging.debug("############################## section_updated_callback "+str(int_section_id))
-        start_time = time.time()
+        start_time = time.perf_counter()
     str_section_id = str(int_section_id)
     # A Track section has been toggled between OCCUPIED/UNOCCUPIED
     # We need to update the highlighting associated with the track section
-    run_layout.update_line_and_point_highlighting(str_section_id)
+    run_layout.update_line_and_point_highlighting([str_section_id])
     signals_to_update = section_linked_signals[str_section_id]
     run_layout.override_signals_based_on_track_sections_ahead(signals_to_update)
     run_layout.update_displayed_signal_aspects(signals_to_update)
@@ -979,14 +987,14 @@ def section_updated_callback(int_section_id:int):
     # Any change to the interlocking could impact the validity of routes
     run_routes.enable_disable_schematic_routes() ##############################################################
     if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        time_in_ms = '%.3f'%((time.perf_counter()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def instrument_updated_callback(int_instrument_id:int):
     if enhanced_debugging:
         logging.debug("############################## instrument_updated_callback "+str(int_instrument_id))
-        start_time = time.time()
+        start_time = time.perf_counter()
     str_instrument_id = (str(int_instrument_id))
     # Signals can be interlocked with Block Instruments on the route ahead, so 
     # any change to the state of an instrument could impact the interlocking
@@ -995,33 +1003,33 @@ def instrument_updated_callback(int_instrument_id:int):
     # Any change to the interlocking could impact the validity of routes
     run_routes.enable_disable_schematic_routes() ##########################################################
     if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        time_in_ms = '%.3f'%((time.perf_counter()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def switch_updated_callback(int_switch_id:int, int_route_id:int=0):
     if enhanced_debugging:
         logging.debug("############################## switch_updated_callback "+str(int_switch_id))
-        start_time = time.time()
+        start_time = time.perf_counter()
     str_switch_id = str(int_switch_id)
     str_route_id = str(int_route_id)
     # As switches can be included in route definitions, any change could invalidate a route
     run_routes.check_routes_valid_after_switch_change(str_switch_id, str_route_id)
     if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        time_in_ms = '%.3f'%((time.perf_counter()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 
 def lever_switched_callback(int_lever_id:int):
     if enhanced_debugging:
         logging.debug("############################## lever_switched_callback "+str(int_lever_id))
-        start_time = time.time()
+        start_time = time.perf_counter()
     str_lever_id = str(int_lever_id)
     # We only process the lever change. That function will change the linked points and signals as
     # required, generating further callbacks as required (sig/sub switched, point/fpl switched etc
     run_layout.process_lever_change(str_lever_id)
     if enhanced_debugging:
-        time_in_ms = '%.3f'%((time.time()-start_time)*1000)
+        time_in_ms = '%.3f'%((time.perf_counter()-start_time)*1000)
         logging.debug("############################## Took "+str(time_in_ms)+" milliseconds")
     return()
 

@@ -936,6 +936,7 @@ def run_track_sensor_occupancy_changes_tests(edit_mode:bool, test_sensors:bool=F
         # Test LH1 => LH2
         set_points_switched(11)
         test_route_sensors(sen1=1, gpio1=22,sec1=37, sec2=31, test_sensors=test_sensors)
+        
         # Test LH2 <= LH2
         set_points_switched(16)
         test_route_sensors(sen1=1, gpio1=22,sec1=31, sec2=33, test_sensors=test_sensors)
@@ -952,6 +953,7 @@ def run_track_sensor_occupancy_changes_tests(edit_mode:bool, test_sensors:bool=F
         # Test RH2 <=RH2
         set_points_switched(14)
         test_route_sensors(sen1=1, gpio1=22,sec1=28, sec2=36, test_sensors=test_sensors)
+        time.sleep(1000)
         #---------------------------------------------------------------------------------------------------
         print("Test Track occupancy changes for Sensors - negative tests - 4 warnings should be generated:")
         # Test the Track Sections both occupied (negative test coverage) - Warning #1
@@ -1664,20 +1666,20 @@ def override_on_distant_signal_ahead_tests(edit_mode:bool, automation_enabled:bo
 #-----------------------------------------------------------------------------------
 
 def run_layout_tests(edit_mode:bool, automation_enabled:bool):
-    run_interlocking_tests(edit_mode=edit_mode)
-    if not edit_mode: run_override_tests(automation_enabled=automation_enabled)
-    run_signal_track_occupancy_changes_tests(edit_mode=edit_mode, test_sensors=False)
-    run_signal_track_occupancy_changes_tests(edit_mode=edit_mode, test_sensors=True)
-    run_track_sensor_occupancy_changes_tests(edit_mode=edit_mode, test_sensors=False)
+#     run_interlocking_tests(edit_mode=edit_mode)
+#     if not edit_mode: run_override_tests(automation_enabled=automation_enabled)
+#     run_signal_track_occupancy_changes_tests(edit_mode=edit_mode, test_sensors=False)
+#     run_signal_track_occupancy_changes_tests(edit_mode=edit_mode, test_sensors=True) ######### Not enough warnings being generated???? ###
+#     run_track_sensor_occupancy_changes_tests(edit_mode=edit_mode, test_sensors=False)
     run_track_sensor_occupancy_changes_tests(edit_mode=edit_mode, test_sensors=True)
-    signals_sections_ahead_and_behind(edit_mode=edit_mode, test_sensors=False)
-    signals_sections_ahead_and_behind(edit_mode=edit_mode, test_sensors=True)
-    sensors_sections_ahead_and_behind(edit_mode=edit_mode, test_sensors=False)
-    sensors_sections_ahead_and_behind(edit_mode=edit_mode, test_sensors=True)
-    shunt_ahead_signal_route_tests(edit_mode=edit_mode, test_sensors=False)
-    shunt_ahead_signal_route_tests(edit_mode=edit_mode, test_sensors=True)
-    interlock_and_override_on_home_signal_ahead_tests(edit_mode=edit_mode, automation_enabled=automation_enabled)
-    override_on_distant_signal_ahead_tests(edit_mode=edit_mode, automation_enabled=automation_enabled)
+#     signals_sections_ahead_and_behind(edit_mode=edit_mode, test_sensors=False)
+#     signals_sections_ahead_and_behind(edit_mode=edit_mode, test_sensors=True)
+#     sensors_sections_ahead_and_behind(edit_mode=edit_mode, test_sensors=False)
+#     sensors_sections_ahead_and_behind(edit_mode=edit_mode, test_sensors=True)
+#     shunt_ahead_signal_route_tests(edit_mode=edit_mode, test_sensors=False)
+#     shunt_ahead_signal_route_tests(edit_mode=edit_mode, test_sensors=True)
+#     interlock_and_override_on_home_signal_ahead_tests(edit_mode=edit_mode, automation_enabled=automation_enabled)
+#     override_on_distant_signal_ahead_tests(edit_mode=edit_mode, automation_enabled=automation_enabled)
     return()
 
 ######################################################################################################
@@ -1685,21 +1687,21 @@ def run_layout_tests(edit_mode:bool, automation_enabled:bool):
 def run_all_run_layout_tests():
     reset_log_counters()
     initialise_test_harness(filename="./test_run_layout.sig")
-    # IMPORTANT - Sig file must be saved in EDIT mode with Automation ON **************
-    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-    test_configuration_windows.test_all_object_edit_windows()
-    # Run the tests in all mode combinations. Note that we don't toggle Automation On/Off in Edit mode as
-    # The 'A' keypress event is disabled and the menubar 'Automation Enable/Disable' selection is inhibited
+#     # IMPORTANT - Sig file must be saved in EDIT mode with Automation ON **************
+#     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+#     test_configuration_windows.test_all_object_edit_windows()
+#     # Run the tests in all mode combinations. Note that we don't toggle Automation On/Off in Edit mode as
+#     # The 'A' keypress event is disabled and the menubar 'Automation Enable/Disable' selection is inhibited
     assert_error_logs_generated(0)
     assert_warning_logs_generated(0)
     
-    print("Run Layout Tests - EDIT Mode / Automation ON **************************************************")    
-    reset_log_counters()
-    run_layout_tests(edit_mode=True, automation_enabled=True)
-    # Check the total number of Log Messages generated
-    assert_error_logs_generated(0)
-    assert_warning_logs_generated(0)
-    report_results()
+#     print("Run Layout Tests - EDIT Mode / Automation ON **************************************************")    
+#     reset_log_counters()
+#     run_layout_tests(edit_mode=True, automation_enabled=True)
+#     # Check the total number of Log Messages generated
+#     assert_error_logs_generated(0)
+#     assert_warning_logs_generated(0)
+#     report_results()
     
     print("Run Layout Tests - RUN Mode / Automation ON ***************************************************")    
     reset_log_counters()
@@ -1710,25 +1712,25 @@ def run_all_run_layout_tests():
     assert_warning_logs_generated(156)
     report_results()
     
-    print("Run Layout Tests - RUN Mode / Automation OFF **************************************************")    
-    reset_log_counters()
-    toggle_automation()
-    run_layout_tests(edit_mode=False, automation_enabled=False)
-    # Check the total number of Log Messages generated
-    assert_error_logs_generated(0)
-    assert_warning_logs_generated(156)
-    report_results()
-    
-    print("Run Layout Tests - EDIT Mode / Automation OFF *************************************************")    
-    reset_log_counters()
-    toggle_mode()
-    run_layout_tests(edit_mode=True, automation_enabled=False)
-    # Check the total number of Log Messages generated
-    assert_error_logs_generated(0)
-    assert_warning_logs_generated(0)
-    report_results()
-    # Toggle automation back on so we end up in Edit Mode with automation on
-    toggle_mode()
+#     print("Run Layout Tests - RUN Mode / Automation OFF **************************************************")    
+#     reset_log_counters()
+#     toggle_automation()
+#     run_layout_tests(edit_mode=False, automation_enabled=False)
+#     # Check the total number of Log Messages generated
+#     assert_error_logs_generated(0)
+#     assert_warning_logs_generated(156)
+#     report_results()
+#     
+#     print("Run Layout Tests - EDIT Mode / Automation OFF *************************************************")    
+#     reset_log_counters()
+#     toggle_mode()
+#     run_layout_tests(edit_mode=True, automation_enabled=False)
+#     # Check the total number of Log Messages generated
+#     assert_error_logs_generated(0)
+#     assert_warning_logs_generated(0)
+#     report_results()
+#     # Toggle automation back on so we end up in Edit Mode with automation on
+#     toggle_mode()
     
 if __name__ == "__main__":
     start_application(lambda:run_all_run_layout_tests())

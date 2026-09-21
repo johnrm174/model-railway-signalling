@@ -244,6 +244,9 @@ def process_signal_aspect_update(str_signal_id:str, home_signal_at_danger:bool=N
     elif str_signal_id in list_of_sigs_already_seen:
         return()
     list_of_sigs_already_seen.append(str_signal_id)
+    # If this is a secondary distant then we need to use the ID of the associated home signal
+    if int(str_signal_id) > 1000:
+        str_signal_id = str(int(str_signal_id) - 1000)
     # This function will accept both local and remote signal IDs. We therefore need to handle
     # the case where we are given a remote signal ID. If it is a remote signal ID then we can't
     # get any info on the signal or signals ahead - we can only read the current state. We
@@ -309,17 +312,22 @@ def process_signal_aspect_update(str_signal_id:str, home_signal_at_danger:bool=N
                 library.clear_approach_control(int(str_signal_id))
         # The displayed aspect of colour light signals can depend on the displayed
         # aspect of the signal ahead. This is ignored for all other signal types.
-        aspect_changed = library.update_signal_aspect(int(str_signal_id), str_signal_ahead_id)
-        signal_state = library.signal_state(int(str_signal_id))
-        ##########################????? Update secondary distants ????? ######################################
+        old_signal_state = library.signal_state(int(str_signal_id))
+        library.update_signal_aspect(int(str_signal_id), str_signal_ahead_id)
+        # We also need to update the secondary distant arms (if there are any for this signal)
+        if has_dist_arm_for_route:
+            library.update_signal_aspect(int(str_signal_id) + 1000)
+        # Work out if the displayed aspect has changed
+        new_signal_state = library.signal_state(int(str_signal_id))
+        aspect_changed = new_signal_state != old_signal_state
         # Update the flags as required to pass back into the function recursively.
         # Note that for distant signals we only care about the signal directly ahead
         # Therefore we can reset this flag if we are not a distant signal at caution
-        if is_dist_signal and signal_state == library.signal_state_type.CAUTION:
+        if is_dist_signal and new_signal_state == library.signal_state_type.CAUTION:
             dist_signal_at_caution = True
         else:
             dist_signal_at_caution = False
-        if is_home_signal and signal_state == library.signal_state_type.DANGER:
+        if is_home_signal and new_signal_state == library.signal_state_type.DANGER:
             home_signal_at_danger = True
     # We only keep walking back down the route if the signal aspect has changed
     # or if the signal is a home signal (where the state of the signals behind
@@ -1051,12 +1059,27 @@ def synchronise_levers_with_signal(str_signal_id:str):
         for str_lever_id in run_common.signal_levers[str_signal_id]:
             lever_type = run_common.signal_levers[str_signal_id][str_lever_id]["levertype"]
             lever_routes = run_common.signal_levers[str_signal_id][str_lever_id]["signalroutes"]
-            if lever_type in ("switchsignal", "switchdistant") and lever_routes[signal_route.value-1]: 
+            if lever_type == "switchsignal" and lever_routes[signal_route.value-1]: 
                 current_lever_state = library.lever_switched(int(str_lever_id))
                 # Synchronise the lever position with the fpl state
                 if current_lever_state != library.signal_clear(int(str_signal_id)):
                     library.toggle_lever(int(str_lever_id))
     return()
+
+def synchronise_levers_with_secondary_dist_arm(str_signal_id:str):
+    str_associated_home_signal_id = str(int(str_signal_id)-1000)
+    signal_route = run_common.signal_valid_route_ahead[str_associated_home_signal_id]
+    if signal_route is not None :
+        for str_lever_id in run_common.signal_levers[str_associated_home_signal_id]:
+            lever_type = run_common.signal_levers[str_associated_home_signal_id][str_lever_id]["levertype"]
+            lever_routes = run_common.signal_levers[str_associated_home_signal_id][str_lever_id]["signalroutes"]
+            if lever_type == "switchdistant" and lever_routes[signal_route.value-1]: 
+                current_lever_state = library.lever_switched(int(str_lever_id))
+                # Synchronise the lever position with the fpl state
+                if current_lever_state != library.signal_clear(int(str_signal_id)):
+                    library.toggle_lever(int(str_lever_id))
+    return()
+
 
 def synchronise_levers_with_subsidary(str_signal_id:str):
     signal_route = run_common.signal_valid_route_ahead[str_signal_id]
