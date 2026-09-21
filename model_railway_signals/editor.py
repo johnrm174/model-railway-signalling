@@ -107,6 +107,7 @@
 from PIL import Image, ImageGrab
 import os
 import sys
+import re
 import tkinter as Tk
 import logging
 import argparse
@@ -114,6 +115,7 @@ import pathlib
 import queue
 import time
 from logging.handlers import QueueHandler, QueueListener
+from datetime import datetime, timedelta
 
 from . import objects
 from . import settings
@@ -139,6 +141,7 @@ class main_menubar:
         self.throttle_server_state = False
         self.sprog_connection_state = False
         self.sprog_power_state = None  # Unknown
+        self.monitor_memory_usage = False
         # Subscribe to DCC Power state changes and throttle server
         library.subscribe_to_local_dcc_power_updates(self.dcc_power_state_updated)
         throttle_server.subscribe_to_server_status(self.throttle_server_state_updated)
@@ -293,7 +296,6 @@ class main_menubar:
         parser.add_argument('os_file_path', nargs='?', default=None,
             help='A positional file path passed by the OS when double-clicking a .sig file.')
         # Catch the flagged argulents
-        parser.add_argument("-d","--debug",dest="debug_mode",action='store_true',help="run editor with debug functions")
         parser.add_argument("-f","--file",dest="filename",metavar="FILE",help="schematic file to load on startup")
         parser.add_argument("-l","--log",dest="log_level",metavar="LEVEL",
                 help="log level (DEBUG, INFO, WARNING, ERROR)")
@@ -307,15 +309,6 @@ class main_menubar:
         # Initialise the editor configuration at startup (using the default settings)
         self.initialise_editor1()
         self.initialise_editor2()
-        # The following code is to help with advanced debugging (start the app with the -d flag)
-        if args.debug_mode:
-            self.debug_menu = Tk.Menu(self.mainmenubar,tearoff=False)
-            self.debug_menu.add_command(label =" Start memory allocation reporting", command=self.start_memory_monitoring)
-            self.debug_menu.add_command(label =" Stop memory allocation reporting", command=self.stop_memory_monitoring)
-            self.debug_menu.add_command(label =" Report the top 10 users of memory", command=self.report_highest_memory_users)
-            self.mainmenubar.add_cascade(label = "Debug  ", menu=self.debug_menu)
-            tracemalloc.start()
-        self.monitor_memory_usage = False
         # If a filename has been specified as an argument (positional or flag) then load it. The
         # loaded settings will overwrite the default settings and initialise_editor will be called.
         # Note we schedule this to run immediately after the main loop starts so Tkinter is 'ready'
@@ -330,46 +323,6 @@ class main_menubar:
         # If a filename has been specified then try to load it
         if file_to_load is not None:
             self.root.after(0, self.load_schematic, file_to_load)
-
-    # --------------------------------------------------------------------------------------
-    # Advanced debugging functions (memory allocation monitoring/reporting)
-    # Full acknowledgements to stack overflow for the reporting functions used here
-    # --------------------------------------------------------------------------------------
-
-    def start_memory_monitoring(self):
-        if not self.monitor_memory_usage:
-            self.monitor_memory_usage=True
-            self.report_memory_usage()
-
-    def stop_memory_monitoring(self):
-        self.monitor_memory_usage=False
-        
-    def report_memory_usage(self):
-        current, peak = tracemalloc.get_traced_memory()
-        print(f"Current memory usage is {current / 10**3}KB; Peak was {peak / 10**3}KB; Diff = {(peak - current) / 10**3}KB")
-        if self.monitor_memory_usage: self.root.after(5000,lambda:self.report_memory_usage())
-
-    def report_highest_memory_users(self):
-        key_type='lineno'
-        limit=10
-        snapshot = tracemalloc.take_snapshot()
-        snapshot = snapshot.filter_traces((tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
-                                           tracemalloc.Filter(False, "<unknown>"),))
-        top_stats = snapshot.statistics(key_type)
-        print("Top %s users of memory (lines of python code)" % limit)
-        for index, stat in enumerate(top_stats[:limit], 1):
-            frame = stat.traceback[0]
-            # replace "/path/to/module/file.py" with "module/file.py"
-            filename = os.sep.join(frame.filename.split(os.sep)[-2:])
-            print("#%s: %s:%s: %.1f KiB" % (index, filename, frame.lineno, stat.size / 1024))
-            line = linecache.getline(frame.filename, frame.lineno).strip()
-            if line: print('        %s' % line)
-        other = top_stats[limit:]
-        if other:
-            size = sum(stat.size for stat in other)
-            print("%s other: %.1f KiB" % (len(other), size / 1024))
-        total = sum(stat.size for stat in top_stats)
-        print("Total allocated size: %.1f KiB" % (total / 1024))
     
     # --------------------------------------------------------------------------------------
     # Common initialisation functions (called on editor start or layout load or new layout)
@@ -444,25 +397,47 @@ class main_menubar:
         self.throttle_server_state = server_state
 
     # --------------------------------------------------------------------------------------
-    # Callback function to handle the Toggle Mode Event ('m' key) from schematic.py
+    # Callback function to handle selected keypress events passed up from schematic.py
     # --------------------------------------------------------------------------------------
 
     def handle_canvas_event(self, event=None):
         # Note that event.keysym returns the character (event.state would be 'Control' etc)
+        # Using event.keysym.lower() will always give 'm' for both 'M' and 'm'
         key = event.keysym.lower()
-        if key == 'm':
+        # Standard Tkinter modifier bits: Shift (1), Lock (2), Control (4), Mod1/Alt (8), Command/Meta (64/128)
+        MODIFIER_MASK = 0x0001 | 0x0002 | 0x0004 | 0x0008 | 0x0040 | 0x0080
+        # Mask out everything except the primary modifiers
+        active_modifiers = event.state & MODIFIER_MASK
+        alt_modifier = (active_modifiers == 0x0008)
+        cntl_modifier = (active_modifiers == 0x0004)
+        if key == 'm' and cntl_modifier:
             if settings.get_general("editmode"): self.run_mode()
             else: self.edit_mode()
-        elif key == 's':
-            # the Snap to Grid flag is the fourth parameter returned
+        elif key == 's' and cntl_modifier:
+            # Only snap to grid if this is enabled
             if settings.get_canvas("snaptogrid"): settings.set_canvas("snaptogrid", False)
             else: settings.set_canvas("snaptogrid", True)
             # Apply the new canvas settings
             self.canvas_update()
-        elif key == 'a':
+        elif key == 'a' and cntl_modifier:
             if settings.get_general("automation"): self.automation_disable()
             else: self.automation_enable()
-            
+        elif key == 'm' and alt_modifier:
+            self.toggle_memory_monitoring()
+
+    # --------------------------------------------------------------------------------------
+    # Advanced debugging functions (memory allocation monitoring/reporting)
+    # Full acknowledgements to stack overflow for the reporting functions used here
+    # --------------------------------------------------------------------------------------
+
+    def toggle_memory_monitoring(self):
+        if not self.monitor_memory_usage:
+            self.monitor_memory_usage=True
+            library.enable_memory_allocation_logging()
+        else:
+            self.monitor_memory_usage=False
+            library.disable_memory_allocation_logging()
+
     #------------------------------------------------------------------------------------------
     # Mode menubar functions
     #------------------------------------------------------------------------------------------
@@ -1057,6 +1032,33 @@ class main_menubar:
                     message="File does not contain\nall required elements")
         return()
 
+#-------------------------------------------------------------------------------------------------
+# Internal Function to delete any previous freeze diagnostic log files based on the timestamp
+# encoded in the filename (file creation time is unreliable/inconsistent across platforms).
+#-------------------------------------------------------------------------------------------------
+
+def cleanup_old_freeze_logs():
+    pattern = re.compile(r"^(\d{8}-\d{6})-model-railway-signals\.log$")
+    cutoff = datetime.now() - timedelta(hours=24)
+    try:
+        for entry in os.listdir("."):
+            match = pattern.match(entry)
+            if not match:
+                continue
+            try:
+                file_timestamp = datetime.strptime(match.group(1), "%Y%m%d-%H%M%S")
+            except ValueError:
+                # Filename looked right but didn't parse - skip it rather than risk deleting the wrong file
+                continue
+            if file_timestamp < cutoff:
+                try:
+                    os.remove(entry)
+                except OSError as e:
+                    # Don't let a locked/in-use file stop startup - just note it and move on
+                    freeze_logger.warning(f"Could not delete old freeze log '{entry}': {e}")
+    except OSError as e:
+        freeze_logger.warning(f"Could not scan for old freeze logs: {e}")
+
 #------------------------------------------------------------------------------------
 # This is the main function to run up the schematic editor application  
 #------------------------------------------------------------------------------------
@@ -1081,8 +1083,13 @@ def run_editor():
     file_log_handler = None
     file_error_msg = None
     try:
+        # Cleanup old log files (log files created over 24 hours ago)
+        cleanup_old_freeze_logs()
+        # Try to create the log file in the current working folder
+        # Format as: YYYYMMDD-HHMMSS-model-railway-signals.log
+        log_filename = datetime.now().strftime("%Y%m%d-%H%M%S-model-railway-signals.log")
         # Try to create the file log handler
-        file_log_handler = logging.FileHandler("model_railway_signalling.log", mode='w')
+        file_log_handler = logging.FileHandler(log_filename, mode='w')
         file_log_handler.setFormatter(formatter)
         listener_handlers.append(file_log_handler)
     except OSError as e:

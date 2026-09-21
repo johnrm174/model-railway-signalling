@@ -940,6 +940,8 @@ def toggle_item_ids(event=None):
 def enable_events_after_completion_of_move():
     if edit_mode_active: enable_edit_mode_event_bindings()
     enable_arrow_keypress_events()
+    canvas.bind('<Alt-Key-m>', canvas_event_callback)            # Toggle malloc logging (debug)
+    canvas.bind('<Alt-Key-M>', canvas_event_callback)            # Toggle malloc logging (debug)
     canvas.bind('<Control-Key-m>', canvas_event_callback)        # Toggle Mode (Edit/Run)
     canvas.bind('<Control-Key-M>', canvas_event_callback)        # Toggle Mode (Edit/Run)
     canvas.bind('<Control-Key-r>', reset_window_size)            # Revert Canvas Size

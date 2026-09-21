@@ -23,6 +23,9 @@
 #                        the best of a bad job shutting down everything (although there may be
 #                        reported exceptions caused by subsequent MQTT and GPIO events)
 #
+# enable_memory_allocation_logging - Enable malloc logging in the freeze diagnostics file
+# disable_memory_allocation_logging - Disable malloc logging in the freeze diagnostics file
+#
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
 #   toggle_item_ids() - toggles the display of Item IDs on/of (in Edit Mode)
 #   bring_item_ids_to_front() - brings Item IDs to the front (in Edit Mode)
@@ -47,11 +50,17 @@ import queue
 import tkinter as Tk
 import time
 import threading
+import functools
 import sys
 import traceback
+import tracemalloc
+import linecache
+import collections
+import faulthandler
 import os
+import re
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from . import gpio_sensors
 from . import mqtt_interface
@@ -410,15 +419,45 @@ def rotate_line(ox,oy,px1,py1,px2,py2,angle):
 # root.event_generate method can sometimes cause the thread to hang
 #-------------------------------------------------------------------------
 
+def record_callback_details(callback):
+    try:
+        # Extract function name and bound arguments
+        if isinstance(callback, functools.partial):
+            func_name = getattr(callback.func, '__name__', str(callback.func))
+            args = callback.args        # Tuple of positional args, e.g. (42,)
+            kwargs = callback.keywords  # Dict of keyword args, e.g. {'id': 42}
+        else:
+            func_name = getattr(callback, '__name__', str(callback))
+            args = ()
+            kwargs = {}
+        # Format positional and keyword args into a clean string representation
+        arg_strings = [repr(a) for a in args] + [f"{k}={v!r}" for k, v in kwargs.items()]
+        callback_details = f"{func_name}({', '.join(arg_strings)})"
+    # Record the breadcrum (so we can see what was called if the app stalls)
+        record_breadcrumb(callback_details)
+    except Exception:
+        logging.exception("Unexpected error recording callback details")
+
 def process_external_events():
-    while not event_queue.empty():
-        try:
-            callback = event_queue.get_nowait()
-            callback()
-        except Exception as exception:
-            logging.error(f"Exception processing event in Tkinter Thread: {exception}")
-    root_window.after(10, process_external_events)
-    return()
+    try:
+        while True:
+            try:
+                callback = event_queue.get_nowait()
+            except queue.Empty:
+                break
+            try:
+                record_callback_details(callback)
+                callback()
+            except Exception:
+                logging.exception("Exception processing event in tkinter thread: %r", callback)
+            finally:
+                event_queue.task_done()
+    except Exception:
+        # Protect the polling function itself from unexpected errors
+        logging.exception("Unexpected error in process_external_events")
+    finally:
+        # Always schedule the next poll, even if a callback failed
+        root_window.after(10, process_external_events)
 
 def execute_function_in_tkinter_thread(callback_function):
     event_queue.put(callback_function)
@@ -431,75 +470,242 @@ def execute_function_in_tkinter_thread(callback_function):
 # A thread-safe flag to track if the GUI is responsive
 gui_responsive = threading.Event()
 gui_responsive.set()
-
-# Set up a dedicated freeze log
+# Threadlock for enabling/disabling tracemalloc
+tracemalloc_thread_lock = threading.Lock()
+# Global flag to enable/disable memory allocation logging
+memory_allocation_logging_enabled = False
+# Set up a dedicated freeze logger
 freeze_logger = logging.getLogger("FreezeDetector")
 freeze_logger.propagate = False
+freeze_log_filename = None
+# Rolling breadcrumb trail of recent tkinter callback activity - cheap to maintain and
+# more useful than the raw stack trace alone when diagnosing "how did we get stuck here"
+breadcrumb_trail = collections.deque(maxlen=50)
+# Timestamp of the last event successfully processed off the queue, so we can report
+# how long the app has actually been stuck for, not just the queue depth right now
+last_event_processed_time = time.time()
 
-try:
-    # Try to create the file handler
-    handler = logging.FileHandler("freeze_diagnostics.log", mode='w')
-    freeze_logger.addHandler(handler)
-except OSError as e:
-    # If it fails, write out a log message to stdout
-    handler = None
-    fallback_handler = logging.StreamHandler(sys.stderr)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    fallback_handler.setFormatter(formatter)
-    freeze_logger.addHandler(fallback_handler)
-    freeze_logger.warning(f"Watchdog Logging is disabled: {e}")
+#-------------------------------------------------------------------------------------------------
+# tkinter.Misc._register is the common choke point that command=, bind(), after(), wm_protocol()
+# events all pass through internally to wrap a Python callable as a Tcl command. We patch the
+# register here so every tkinter-dispatched callback gets a breadcrumb automatically, without
+# needing to modify every call site in the codebase.
+#-------------------------------------------------------------------------------------------------
+
+original_register = Tk.Misc._register
+def breadcrumb_register(self, func, subst=None, needcleanup=1):
+    # Wrap the caller's callback so invoking it records a breadcrumb first
+    def wrapped_callback(*args, **kwargs):
+        # NEW: best-effort label - qualified name if available, else repr
+        label = getattr(func, '__qualname__', repr(func))
+        record_breadcrumb(f"tk-callback: {label}")
+        return func(*args, **kwargs)
+    return original_register(self, wrapped_callback, subst, needcleanup)
+Tk.Misc._register = breadcrumb_register
+
+#-------------------------------------------------------------------------------------------------
+# Internal Function to delete any previous freeze diagnostic log files based on the timestamp
+# encoded in the filename (file creation time is unreliable/inconsistent across platforms).
+#-------------------------------------------------------------------------------------------------
+
+def cleanup_old_freeze_logs():
+    pattern = re.compile(r"^(\d{8}-\d{6})-freeze-diagnostics\.log$")
+    cutoff = datetime.now() - timedelta(hours=24)
+    try:
+        for entry in os.listdir("."):
+            match = pattern.match(entry)
+            if not match:
+                continue
+            try:
+                file_timestamp = datetime.strptime(match.group(1), "%Y%m%d-%H%M%S")
+            except ValueError:
+                # Filename looked right but didn't parse - skip it rather than risk deleting the wrong file
+                continue
+            if file_timestamp < cutoff:
+                try:
+                    os.remove(entry)
+                except OSError as e:
+                    # Don't let a locked/in-use file stop startup - just note it and move on
+                    freeze_logger.warning(f"Could not delete old freeze log '{entry}': {e}")
+    except OSError as e:
+        freeze_logger.warning(f"Could not scan for old freeze logs: {e}")
+
+#-------------------------------------------------------------------------------------------------
+# Library API functions to enable/disable memory allocation reporting)
+#-------------------------------------------------------------------------------------------------
+
+def enable_memory_allocation_logging():
+    global memory_allocation_logging_enabled
+    with tracemalloc_thread_lock:
+        tracemalloc.start()
+        report_highest_memory_users()
+        memory_allocation_logging_enabled = True
+
+def disable_memory_allocation_logging():
+    global memory_allocation_logging_enabled
+    with tracemalloc_thread_lock:
+        memory_allocation_logging_enabled = False
+        tracemalloc.stop()
+
+#-------------------------------------------------------------------------------------------------
+# Internal function that runs in the Tkinter thread (to test that the thread is still alive)
+#-------------------------------------------------------------------------------------------------
 
 def probe_callback():
     # This function runs in the main tkinter thread
+    global last_event_processed_time
+    last_event_processed_time = time.time()
     gui_responsive.set()
 
-def flush_to_disk():
+#-------------------------------------------------------------------------------------------------
+# Internal function that records breadcrums of tkinter events to provide a bit of a traceback
+#-------------------------------------------------------------------------------------------------
+
+def record_breadcrumb(label):
+    # Call this from wherever tkinter callbacks/events are dispatched, to build up a
+    # short trail of "what ran recently" leading up to a freeze
+    breadcrumb_trail.append((time.strftime('%Y-%m-%d %H:%M:%S'), label))
+
+#-------------------------------------------------------------------------------------------------
+# This function records breadcrums of tkinter events to provide a bit of a traceback
+#-------------------------------------------------------------------------------------------------
+
+def flush_to_disk(force_fsync=False):
     handler.flush()
-    try: os.fsync(handler.stream.fileno())
-    except (AttributeError, ValueError): pass
+    #fsync is only really needed for the one-shot diagnostic snapshot write - it's the
+    # thing we can least afford to lose. Routine heartbeat writes only need a plain flush,
+    # which avoids paying the fsync cost every 10 seconds for no real benefit.
+    if force_fsync:
+        try: os.fsync(handler.stream.fileno())
+        except (AttributeError, ValueError): pass
+
+#-------------------------------------------------------------------------------------------------
+# Internal Functions to log memory stats and top 10 users of memory
+#-------------------------------------------------------------------------------------------------
+
+def report_memory_allocation_stats():
+    current, peak = tracemalloc.get_traced_memory()
+    log_string = f"Current memory usage is {current / 10**3}KB; Peak was {peak / 10**3}KB; Diff = {(peak - current) / 10**3}KB\n"
+    handler.stream.write(log_string)
+    flush_to_disk()
+
+def report_highest_memory_users():
+    key_type='lineno'
+    limit=10
+    snapshot = tracemalloc.take_snapshot()
+    snapshot = snapshot.filter_traces((tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),tracemalloc.Filter(False, "<unknown>"),))
+    top_stats = snapshot.statistics(key_type)
+    handler.stream.write("--------------------------------------------------------------------------------------------------\n")
+    handler.stream.write("Top %s users of memory (lines of python code)\n" % limit)
+    for index, stat in enumerate(top_stats[:limit], 1):
+        frame = stat.traceback[0]
+        filename = os.sep.join(frame.filename.split(os.sep)[-2:])
+        line = linecache.getline(frame.filename, frame.lineno).strip()
+        if line:
+            handler.stream.write(f"#{index}: {filename}:{frame.lineno}: {stat.size / 1024:.1f} KiB: {line}\n")
+        else:
+            handler.stream.write(f"#{index}: {filename}:{frame.lineno}: {stat.size / 1024:.1f} KiB\n")
+    other = top_stats[limit:]
+    if other:
+        size = sum(stat.size for stat in other)
+        handler.stream.write("%s other: %.1f KiB\n" % (len(other), size / 1024))
+    total = sum(stat.size for stat in top_stats)
+    handler.stream.write("Total allocated size: %.1f KiB\n" % (total / 1024))
+    handler.stream.write("--------------------------------------------------------------------------------------------------\n")
+    flush_to_disk()
+
+#-------------------------------------------------------------------------------------------------
+# Watchdog monitor thread - monitors that the tkinter event loop is still alive and also
+# logs memory allocation information (if enabled) at regular intervals for debug purposes.
+# When a freeze is detected, it captures a diagnostic snapshot and writes to disk
+#-------------------------------------------------------------------------------------------------
 
 def watchdog_monitor():
-    heartbeat_count = 0
+    logging_count1 = 0
+    logging_count2 = 0
     freeze_logger.error(f"Watchdog Started at {time.strftime('%Y-%m-%d %H:%M:%S')}")
     while True:
         try:
-            # Start a new line with a timestamp if we are at the beginning
-            if heartbeat_count == 0:
-                timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-                handler.stream.write(f"{timestamp} - HEARTBEAT: ")
-                flush_to_disk()
+            # Log the current memory usage every minute (6 * 10) seconds
+            logging_count1 += 1
+            if logging_count1 == 1:
+                with tracemalloc_thread_lock:
+                    if memory_allocation_logging_enabled:
+                        report_memory_allocation_stats()
+                logging_count1 = 0
+            # Snapshot the main memory users every 10 minutes (60*10 seconds)
+            logging_count2 += 1
+            if logging_count2 == 2:
+                with tracemalloc_thread_lock:
+                    if memory_allocation_logging_enabled:
+                        report_highest_memory_users()
+                logging_count2 = 0
             # Clear the shutdown event and execute the probe function in the main thread
             gui_responsive.clear()
             execute_function_in_tkinter_thread(probe_callback)
-            # Wait 15 seconds OR until shutdown_event.set() is called.
-            if shutdown_event.wait(timeout=15): break
+            # Wait 10 seconds OR until shutdown_event.set() is called.
+            if shutdown_event.wait(timeout=10): break
             # If the probe_callback hasn't finished then we know the tkinter main_loop has hung
             if not gui_responsive.is_set():
-                print("Application Freeze Detected - Capturing diagnostic snapshot")
                 handler.stream.write(" [FREEZE DETECTED]\n")
                 flush_to_disk()
                 capture_diagnostic_snapshot()
                 break
-            # Heartbeat Logic (Write one dot every 30s cycle)
-            handler.stream.write(".")
-            heartbeat_count += 1
-            flush_to_disk()
-            if heartbeat_count >= 100:
-                handler.stream.write("\n")
-                flush_to_disk()
-                heartbeat_count = 0
         except Exception as exception:
             freeze_logger.error(f"Watchdog Monitor - Exception processing heartbeat: {exception}")
             time.sleep (1.0)
     return()
+
+#-------------------------------------------------------------------------------------------------
+# Internal function to capture the diagnostic snapshot and write to disk
+#-------------------------------------------------------------------------------------------------
 
 def capture_diagnostic_snapshot():
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
     # Capture the queue depth at the moment of the freeze
     try: current_queue_size = event_queue.qsize()
     except: current_queue_size = "Unknown/Error"
-    header = (f"\n{'='*30}\nFREEZE SNAPSHOT: {timestamp}\nQueue Backlog: {current_queue_size} items\n{'='*30}\n")
+    # How long has it actually been since the GUI thread last confirmed it was alive
+    seconds_since_last_response = time.time() - last_event_processed_time
+    header = (f"\n{'='*30}\nFREEZE SNAPSHOT: {timestamp}\nQueue Backlog: {current_queue_size} items\n"
+              f"Seconds Since Last Confirmed Response: {seconds_since_last_response:.1f}\n{'='*30}\n")
     output = [header]
+    # Dump the breadcrumb trail of recent tkinter callback activity leading up to the freeze
+    output.append("\nRECENT CALLBACK BREADCRUMBS (oldest first):")
+    if breadcrumb_trail:
+        for crumb_time, crumb_label in breadcrumb_trail:
+            output.append(f"\n  {crumb_time} - {crumb_label}")
+    else:
+        output.append("\n  (none recorded)")
+    # Pending Tk 'after' callbacks can reveal a backlog piling up behind a stuck callback
+    try:
+        pending_after_ids = root.tk.call('after', 'info')
+        output.append(f"\n\nPending Tk 'after' Callbacks: {len(pending_after_ids)}")
+    except Exception as exception:
+        output.append(f"\n\nPending Tk 'after' Callbacks: Unknown/Error ({exception})")
+    # Garbage collector state - a long GC pause or reference-cycle buildup can look like a freeze
+    try:
+        gc_counts = gc.get_count()
+        output.append(f"\nGC Object Count: {len(gc.get_objects())}, GC Generation Counts: {gc_counts}, "
+                       f"Uncollectable Garbage: {len(gc.garbage)}")
+    except Exception as exception:
+        output.append(f"\nGC Stats: Unknown/Error ({exception})")
+    # Process-level resource snapshot (memory/FDs/threads) - optional, only if psutil is available
+    try:
+        process = psutil.Process(os.getpid())
+        memory_info = process.memory_info()
+        output.append(f"\nProcess RSS: {memory_info.rss / 1024 / 1024:.1f} MiB, "
+                       f"VMS: {memory_info.vms / 1024 / 1024:.1f} MiB, "
+                       f"Open FDs: {process.num_fds() if hasattr(process, 'num_fds') else 'N/A'}, "
+                       f"Threads: {process.num_threads()}")
+    except Exception as exception:
+        output.append(f"\nProcess Resource Snapshot: Unknown/Error ({exception})")
+    # Capture all thread stacks using faulthandler as an additional low-level diagnostic,
+    # taken independently of the sys._current_frames() walk below - a second, C-level view of
+    # the same moment in case anything about the Python-level walk is itself compromised
+    if handler:
+        output.append("\nFAULTHANDLER THREAD TRACEBACKS:\n")
+        faulthandler.dump_traceback(file=handler.stream, all_threads=True)
     # sys._current_frames() returns {thread_id: stack_frame}
     for thread_id, frame in sys._current_frames().items():
         # Identify which thread is which
@@ -511,7 +717,30 @@ def capture_diagnostic_snapshot():
         output.append(f"\nTHREAD: {thread_name} (ID: {thread_id})")
         output.append("".join(traceback.format_stack(frame)))
     freeze_logger.error("".join(output))
-    print("Application Freeze Detected - Diagnodstic snapshot written to 'freeze_diagnostics.log'")
+    # Force an fsync on this write specifically - this is the one write we can't afford to lose
+    flush_to_disk(force_fsync=True)
+    print(f"Application Freeze Detected - Diagnostic snapshot written to {freeze_log_filename}")
+
+#-------------------------------------------------------------------------------------------------
+# The following code runs at initialisation to create the log file and log handlers
+#-------------------------------------------------------------------------------------------------
+
+try:
+    # Cleanup old log files (log files created over 24 hours ago)
+    cleanup_old_freeze_logs()
+    # Try to create the log file in the current working folder
+    # Format as: YYYYMMDD-HHMMSS-freeze-diagnostics.log
+    freeze_log_filename = datetime.now().strftime("%Y%m%d-%H%M%S-freeze-diagnostics.log")
+    handler = logging.FileHandler(freeze_log_filename, mode='w')
+    freeze_logger.addHandler(handler)
+except OSError as e:
+    # If we can't create the file, write out a log message to stdout
+    handler = None
+    fallback_handler = logging.StreamHandler(sys.stderr)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fallback_handler.setFormatter(formatter)
+    freeze_logger.addHandler(fallback_handler)
+    freeze_logger.warning(f"Watchdog Logging is disabled: {e}")
 
 # Only start the watchdog/freeze logging thread if the handler was successfully
 # created (ie if the current folder/file is writable by the application)

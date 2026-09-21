@@ -16,6 +16,8 @@ from .common import display_warning
 from .common import toggle_item_ids
 from .common import bring_item_ids_to_front
 from .common import execute_function_in_tkinter_thread
+from .common import enable_memory_allocation_logging
+from .common import disable_memory_allocation_logging
 
 from .signals import signal_type
 from .signals import signal_subtype
@@ -229,6 +231,8 @@ __all__ = [
         'toggle_item_ids',
         'bring_item_ids_to_front',
         'execute_function_in_tkinter_thread',
+        'enable_memory_allocation_logging',
+        'disable_memory_allocation_logging',
       # Public point types/functions
         'point_type',
         'point_subtype',

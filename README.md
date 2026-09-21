@@ -58,9 +58,14 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 * Keyboard shortcuts (see help=>help) will now work for both upper case or lower case keypresses)
 * Minor editor performance improvements - when moving large numbers of selected objects
-* New 'Export as Image' function to generate a 'png' image of the application/schematic
+* New 'Export as Image' function to generate a 'png' image of full schematics
 * Minor bugfix to NX route setting (fix edge case seen when route selection in progress)
 * Improve robustness of GPIO sensor triggering (mainly for the scripting interface)
+* Improve thread safety for handling external events in the Tkinter main loop
+* Improved diagnostic logging - log files are timestamped with their creation time/date
+    * Easier to identify and retain log files of interest for further diagnosis.
+    * Log files older than 24 hours are automatically deleted on application start
+
 
 
 ![Example Screenshot2](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
