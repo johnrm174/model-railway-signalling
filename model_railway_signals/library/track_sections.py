@@ -40,6 +40,9 @@
 #   section_label(section_id:int)- Returns the 'label' of the section (as a string)
 #
 #   update_mirrored_section(section_id:int, mirrored_section_id:int) - update the section to mirror
+#
+#   enable_manual_section_toggling() - Enable the manual toggling of section state
+#   disable_manual_section_toggling() - disable the manual toggling of section state
 # 
 #   set_section_occupied - Sets the section to "OCCUPIED" (and updates the 'label' if required)
 #     Mandatory Parameters:
@@ -225,6 +228,20 @@ def make_vertical(text: str):
     return ("\n".join(list(str(text))))
 
 #---------------------------------------------------------------------------------------------
+# API Functions to Enable/disable manual section toggling
+#---------------------------------------------------------------------------------------------
+
+manual_section_toggling_enabled = True
+
+def enable_manual_section_toggling():
+    global manual_section_toggling_enabled
+    manual_section_toggling_enabled = True
+
+def disable_manual_section_toggling():
+    global manual_section_toggling_enabled
+    manual_section_toggling_enabled = False
+
+#---------------------------------------------------------------------------------------------
 # Internal Function to handle the double-left-click of a (local) Track Section
 # This will open a throttle window and try to select the locomotive from the roster
 # if a loco name in the roster matches the train identifier in the track section
@@ -239,9 +256,11 @@ def make_vertical(text: str):
 
 def open_throttle_window(section_id:int):
     # This function will be called whenever a Track Section is double clicked, but the first
-    # click will already have been processed to toggle the state. The first thing we need to
-    # do is therefore to toggle the state back to what it was before the double click
-    section_state_toggled(section_id)
+    # click will already have been processed to toggle the state if manual toggling of track
+    # sections is enabled). If this is the case, thehe first thing we need to do is to
+    # toggle the state back to what it was before the double click
+    if manual_section_toggling_enabled:
+        section_state_toggled(section_id)
     # We only open the throttle window if the section is showing occupied by a loco
     if sections[str(section_id)]["occupied"]:
         train_id = sections[str(section_id)]["labeltext"]
@@ -298,7 +317,9 @@ def section_button_released_event(section_id:int):
     global section_pressed, section_released, section_left1, section_left2
     #logging.debug("Section "+str(section_id)+": Track Section released event **********************************************")
     if section_pressed == section_id:
-        section_state_toggled(section_id)
+        # Only toggle the section if manual toggling is enabled:
+        if manual_section_toggling_enabled:
+            section_state_toggled(section_id)
         section_released = None
     elif section_left1 == section_id:
         section_released = section_id
@@ -422,7 +443,7 @@ def mqtt_send_all_section_states_on_broker_connect():
 def toggle_section_button(section_id:int):
     global sections
     if sections[str(section_id)]["occupied"]:
-        logging.info ("Section "+str(section_id)+": Changing to CLEAR - Label '"+sections[str(section_id)]["labeltext"]+"'")
+        logging.info ("Section "+str(section_id)+": Changing to CLEAR")
         sections[str(section_id)]["occupied"] = False
         sections[str(section_id)]["button"].config(background=sections[str(section_id)]["deselectedbgcolour"])
         sections[str(section_id)]["button"].config(foreground=sections[str(section_id)]["deselectedfgcolour"])

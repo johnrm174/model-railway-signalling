@@ -1310,6 +1310,10 @@ class edit_general_settings():
             self.frame2 = Tk.LabelFrame(self.window, text = "Run Layout settings")
             self.frame2.pack(padx=2, pady=2, fill=Tk.BOTH)
             # Create the "SPAD Popups" selection element
+            self.disablesectiontoggling = common.check_box(self.frame2, label="Disable section toggling",
+                    tool_tip="Select to disable manual toggling of Track Sections between OCCUPIED and CLEAR on the schematic "+
+                                     "(train identifiers can still be dragged and dropped between Track Sections)")
+            self.disablesectiontoggling.pack(padx=2, pady=2)
             self.enablespadpopups = common.check_box(self.frame2, label="Enable popup SPAD warnings",
                     tool_tip="Select to enable popup Signal Passed at Danger (SPAD) and other track occupancy warnings")
             self.enablespadpopups.pack(padx=2, pady=2)
@@ -1355,6 +1359,7 @@ class edit_general_settings():
 
     def load_state(self):
         self.validation_error.pack_forget()
+        self.disablesectiontoggling.set_value(settings.get_general("disablesectiontoggling"))
         self.enablespadpopups.set_value(settings.get_general("spadpopups"))
         self.enableleverpopups.set_value(settings.get_general("leverpopupwarnings"))
         self.leverinterlocking.set_value(settings.get_general("leverinterlocking"))
@@ -1365,6 +1370,7 @@ class edit_general_settings():
     def save_state(self, close_window:bool):
         if self.resetdelay.validate() and self.fontsize.validate() and self.baseitemid.validate():
             self.validation_error.pack_forget()
+            settings.set_general("disablesectiontoggling", self.disablesectiontoggling.get_value())
             settings.set_general("spadpopups", self.enablespadpopups.get_value())
             settings.set_general("leverpopupwarnings", self.enableleverpopups.get_value())
             settings.set_general("leverinterlocking", self.leverinterlocking.get_value())

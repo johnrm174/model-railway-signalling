@@ -42,6 +42,7 @@ default_settings["general"]["spadpopups"] = False
 default_settings["general"]["resetdelay"] = 0
 default_settings["general"]["leverinterlocking"] = False
 default_settings["general"]["leverpopupwarnings"] = False
+default_settings["general"]["disablesectiontoggling"] = False
 
 default_settings["canvas"] = {}
 default_settings["canvas"]["width"] = 1000

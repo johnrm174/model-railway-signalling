@@ -104,6 +104,8 @@ from .track_sections import reset_sections_mqtt_configuration
 from .track_sections import set_sections_to_publish_state
 from .track_sections import subscribe_to_remote_sections
 from .track_sections import update_section_styles
+from .track_sections import enable_manual_section_toggling
+from .track_sections import disable_manual_section_toggling
 
 from .track_sensors import create_track_sensor
 from .track_sensors import track_sensor_exists
@@ -339,6 +341,8 @@ __all__ = [
         'reset_sections_mqtt_configuration',
         'subscribe_to_remote_sections',
         'set_sections_to_publish_state',
+        'enable_manual_section_toggling',
+        'disable_manual_section_toggling',
       # public gpio sensor
         'gpio_sensor_triggered',
         'gpio_sensor_released',
