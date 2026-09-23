@@ -722,6 +722,10 @@ class main_menubar:
         ignore_interlocking = settings.get_general("leverinterlocking")
         lever_warnings = settings.get_general("leverpopupwarnings")
         library.set_lever_switching_behaviour(ignore_interlocking, lever_warnings)
+        if settings.get_general("disablesectiontoggling"):
+            library.disable_manual_section_toggling()
+        else:
+            library.enable_manual_section_toggling()
         # Application Settings - Menubar
         font_size = settings.get_general("menubarfontsize")
         self.mainmenubar.config(font=("", font_size))
@@ -1038,7 +1042,7 @@ class main_menubar:
 #-------------------------------------------------------------------------------------------------
 
 def cleanup_old_freeze_logs():
-    pattern = re.compile(r"^(\d{8}-\d{6})-model-railway-signals\.log$")
+    pattern = re.compile(r"^(\d{8}-\d{6}-\d{6})-model-railway-signals\.log$")
     cutoff = datetime.now() - timedelta(hours=24)
     try:
         for entry in os.listdir("."):
@@ -1046,7 +1050,7 @@ def cleanup_old_freeze_logs():
             if not match:
                 continue
             try:
-                file_timestamp = datetime.strptime(match.group(1), "%Y%m%d-%H%M%S")
+                file_timestamp = datetime.strptime(match.group(1), "%Y%m%d-%H%M%S-%f")
             except ValueError:
                 # Filename looked right but didn't parse - skip it rather than risk deleting the wrong file
                 continue
@@ -1086,8 +1090,8 @@ def run_editor():
         # Cleanup old log files (log files created over 24 hours ago)
         cleanup_old_freeze_logs()
         # Try to create the log file in the current working folder
-        # Format as: YYYYMMDD-HHMMSS-model-railway-signals.log
-        log_filename = datetime.now().strftime("%Y%m%d-%H%M%S-model-railway-signals.log")
+        # Format as: YYYYMMDD-HHMMSS-MMMMMM-model-railway-signals.log
+        log_filename = datetime.now().strftime("%Y%m%d-%H%M%S-%f-model-railway-signals.log")
         # Try to create the file log handler
         file_log_handler = logging.FileHandler(log_filename, mode='w')
         file_log_handler.setFormatter(formatter)
