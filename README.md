@@ -56,10 +56,12 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 > upgrade to Release 6.0.0 and then load/re-save your files before upgrading to Release 6.x.x.
 > You have been warned!
 
-* Keyboard shortcuts (see help=>help) will now work for both upper case or lower case keypresses)
-* Minor editor performance improvements - when moving large numbers of selected objects
+* New feature (under general settings) to inhibit the manual toggling of track sections:
+    * Prevents inadvertant changes to track occupancy during layout operation
 * New 'Export as Image' function to generate a 'png' image of full schematics
 * Minor bugfix to NX route setting (fix edge case seen when route selection in progress)
+* Keyboard shortcuts (see help=>help) will now work for both upper case or lower case keypresses)
+* Minor editor performance improvements - when moving large numbers of selected objects
 * Improve robustness of GPIO sensor triggering (mainly for the scripting interface)
 * Improve thread safety for handling external events in the Tkinter main loop
 * Improved diagnostic logging - log files are timestamped with their creation time/date
