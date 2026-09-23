@@ -509,7 +509,7 @@ Tk.Misc._register = breadcrumb_register
 #-------------------------------------------------------------------------------------------------
 
 def cleanup_old_freeze_logs():
-    pattern = re.compile(r"^(\d{8}-\d{6})-freeze-diagnostics\.log$")
+    pattern = re.compile(r"^(\d{8}-\d{6}-\d{6})-freeze-diagnostics\.log$")
     cutoff = datetime.now() - timedelta(hours=24)
     try:
         for entry in os.listdir("."):
@@ -517,7 +517,7 @@ def cleanup_old_freeze_logs():
             if not match:
                 continue
             try:
-                file_timestamp = datetime.strptime(match.group(1), "%Y%m%d-%H%M%S")
+                file_timestamp = datetime.strptime(match.group(1), "%Y%m%d-%H%M%S-%f")
             except ValueError:
                 # Filename looked right but didn't parse - skip it rather than risk deleting the wrong file
                 continue
@@ -628,14 +628,14 @@ def watchdog_monitor():
         try:
             # Log the current memory usage every minute (6 * 10) seconds
             logging_count1 += 1
-            if logging_count1 == 1:
+            if logging_count1 == 6:
                 with tracemalloc_thread_lock:
                     if memory_allocation_logging_enabled:
                         report_memory_allocation_stats()
                 logging_count1 = 0
             # Snapshot the main memory users every 10 minutes (60*10 seconds)
             logging_count2 += 1
-            if logging_count2 == 2:
+            if logging_count2 == 60:
                 with tracemalloc_thread_lock:
                     if memory_allocation_logging_enabled:
                         report_highest_memory_users()
@@ -729,8 +729,8 @@ try:
     # Cleanup old log files (log files created over 24 hours ago)
     cleanup_old_freeze_logs()
     # Try to create the log file in the current working folder
-    # Format as: YYYYMMDD-HHMMSS-freeze-diagnostics.log
-    freeze_log_filename = datetime.now().strftime("%Y%m%d-%H%M%S-freeze-diagnostics.log")
+    # Format as: YYYYMMDD-HHMMSS-MMMMMM-freeze-diagnostics.log
+    freeze_log_filename = datetime.now().strftime("%Y%m%d-%H%M%S-%f-freeze-diagnostics.log")
     handler = logging.FileHandler(freeze_log_filename, mode='w')
     freeze_logger.addHandler(handler)
 except OSError as e:
