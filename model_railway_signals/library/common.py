@@ -57,6 +57,8 @@ import tracemalloc
 import linecache
 import collections
 import faulthandler
+import tempfile
+import json
 import os
 import re
 
@@ -89,9 +91,10 @@ event_queue = queue.Queue()
 editing_enabled = False
 # Global Flag to enable or disable the processing of keypress events
 keypresses_enabled = True
-
 # A thread-safe flag to indicate shutdown has been initiated
 shutdown_event = threading.Event()
+# A global flag used by all library functions to indicate the status of an object has changed.
+schematic_state_changed = False
 
 #---------------------------------------------------------------------------------------------
 # Popup window for displaying Run Layout Warnings. Used by the Levers library module to
@@ -267,6 +270,8 @@ def set_root_window(root):
     root_window.bind("<Key>", keyboard_handler)
     # Start the polling loop (for handling events passed in by other threads)
     root_window.after(100, process_external_events)
+    # Start the loop to capture and save layout state snapshots
+    capture_and_save_snapshots()
     return()
 
 #-------------------------------------------------------------------------
@@ -412,11 +417,8 @@ def rotate_line(ox,oy,px1,py1,px2,py2,angle):
     return (start_point, end_point)
 
 #-------------------------------------------------------------------------
-# Functions to allow custom callback functions to be passed in (from an
-# external thread) and then handled in the main Tkinter thread (to keep
-# everything threadsafe). We Use a polling Method (pulling from a Queue
-# as we know Tkinter isnt thread safe - Even the Root.after method and
-# root.event_generate method can sometimes cause the thread to hang
+# Function to provide a breadcrumb trail of events we are executuing
+# in the main Tkinter thread for application freeze diagnaostics
 #-------------------------------------------------------------------------
 
 def record_callback_details(callback):
@@ -438,13 +440,21 @@ def record_callback_details(callback):
     except Exception:
         logging.exception("Unexpected error recording callback details")
 
+#-------------------------------------------------------------------------
+# Functions to allow custom callback functions to be passed in (from an
+# external thread) and then handled in the main Tkinter thread (to keep
+# everything threadsafe). We Use a polling Method (pulling from a Queue
+# as we know Tkinter isnt thread safe - Even the Root.after method and
+# root.event_generate method can sometimes cause the thread to hang
+#-------------------------------------------------------------------------
+
 def process_external_events():
     try:
-        while True:
-            try:
-                callback = event_queue.get_nowait()
-            except queue.Empty:
-                break
+        try:
+            callback = event_queue.get_nowait()
+        except queue.Empty:
+            pass
+        else:
             try:
                 record_callback_details(callback)
                 callback()
@@ -462,6 +472,77 @@ def process_external_events():
 def execute_function_in_tkinter_thread(callback_function):
     event_queue.put(callback_function)
     return()
+
+##################################################################################################
+# Functions for configuring 'autosave' snapshots of layout state for disaster recovery purposes
+# in the event of an application freeze or crash. We only really meed to save track occupancy
+# information (as this could have changed significantly during a running session - other object
+# states are less critical (easy enough to reconfigure routes/points/signals etc)
+##################################################################################################
+
+snapshot_queue = queue.Queue()
+snapshot_frequency_milliseconds = 1000
+snapshot_filename = None
+
+def configure_snapshot_frequency(frequency_seconds:int):
+    global snapshot_frequency_milliseconds
+    if frequency_seconds <= 0:
+        logging.error("configure_layout_snapshots - snapshot frequency must be greater than zero")
+    else:
+        snapshot_frequency_milliseconds = frequency_seconds * 1000
+
+def disable_layout_snapshots():
+    global snapshot_filename
+    snapshot_filename = None
+
+def enable_layout_snapshots(layout_filename:str):
+    global snapshot_filename
+    snapshot_filename = layout_filename + ".recovery"
+
+def capture_and_save_snapshots():
+    global schematic_state_changed
+    try:
+        if snapshot_filename and schematic_state_changed:
+            snapshot_data = {}
+            snapshot_data["sections"] = track_sections.get_section_state_snapshot()
+            snapshot_queue.put((snapshot_filename, snapshot_data))
+            schematic_state_changed = False
+    except Exception:
+        # Protect the polling function itself from unexpected errors
+        logging.exception("Unexpected error creating recovery snapshot")
+    finally:
+        # Always schedule the next poll, even if a callback failed
+        root_window.after(snapshot_frequency_milliseconds, capture_and_save_snapshots)
+
+#-------------------------------------------------------------------------------------------------
+# Thread to retrieve the current layout snapshot and write to file so any disk I/O delays
+# don't impact the main tkinter thread. This should be resilliant to application crashes
+#-------------------------------------------------------------------------------------------------
+
+def thread_to_write_layout_snapshots_to_file():
+    while True:
+        try:
+            snapshot_filename, layout_state  = snapshot_queue.get(timeout=10)
+        except queue.Empty:
+            pass
+        else:
+            if snapshot_filename is not None:
+                directory = os.path.dirname(snapshot_filename)
+                file_descriptor, temp_filename = tempfile.mkstemp(dir=directory)
+                try:
+                    with os.fdopen(file_descriptor, "w") as file_to_write:
+                        json.dump(layout_state, file_to_write, indent=2)
+                        file_to_write.flush()
+                        os.fsync(file_to_write.fileno())
+                    os.replace(temp_filename, snapshot_filename)
+                except OSError as error:
+                    print(f"SnapshotWriter: failed to write {self.filename}: {error}")
+                finally:
+                    if os.path.exists(temp_filename):
+                        os.remove(temp_filename)
+
+# Start the layout snapshot writing thread
+threading.Thread(target=thread_to_write_layout_snapshots_to_file, daemon=True).start()
 
 ##################################################################################################
 # Probe function to detect main thread freezes and write them out to file

@@ -221,6 +221,15 @@ def section_exists(section_id:Union[int,str]):
     return(section_exists)
 
 #---------------------------------------------------------------------------------------------
+# Library Function to extract the main state data from the dictionary of objects.
+# This uses dict comprehension for the fastest general-purpose approach.
+#---------------------------------------------------------------------------------------------
+
+def get_section_state_snapshot():
+    return { section_id: {"occupied": section["occupied"], "labeltext": section["labeltext"] }
+                  for section_id, section in sections.items() }
+
+#---------------------------------------------------------------------------------------------
 # Internal Helper Function to Change a test string to a vertical text string
 #---------------------------------------------------------------------------------------------
 
@@ -373,6 +382,8 @@ def section_state_toggled(section_id:int, required_state:bool=None, make_callbac
         update_mirrored_sections(section_id)
         # Make the external callback (if one has been defined)
         if make_callback: sections[str(section_id)]["extcallback"] (section_id)
+        # Mark the change (for saving layout state snapshots
+        common.schematic_state_changed = True
     return ()
 
 #---------------------------------------------------------------------------------------------
@@ -829,6 +840,8 @@ def set_section_occupied(section_id:int, new_label:str=None):
         if section_updated:
             send_mqtt_section_updated_event(section_id)
             update_mirrored_sections(section_id)
+            # Mark the change (for saving layout state snapshots
+            common.schematic_state_changed = True
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -851,6 +864,8 @@ def clear_section_occupied(section_id:int):
             toggle_section_button(section_id)
             send_mqtt_section_updated_event(section_id)
             update_mirrored_sections(section_id)
+            # Mark the change (for saving layout state snapshots
+            common.schematic_state_changed = True
         # Return the current Section Label to the calling function
         section_label = sections[str(section_id)]["labeltext"]
     return(section_label)
