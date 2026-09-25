@@ -88,7 +88,7 @@ root_window = None
 # Event queue for passing "commands" back into the main tkinter thread
 event_queue = queue.Queue()
 # Global flag to track the mode (set via the configure_edit_mode function)
-editing_enabled = False
+application_in_edit_mode = False
 # Global Flag to enable or disable the processing of keypress events
 keypresses_enabled = True
 # A thread-safe flag to indicate shutdown has been initiated
@@ -190,7 +190,7 @@ def display_warning(canvas, message:str):
 keyboard_mappings= {}
 
 def keyboard_handler(event):
-    if not editing_enabled and keypresses_enabled:
+    if not application_in_edit_mode and keypresses_enabled:
         debug_string = "Schematic Keypress event: Keycode="+str(event.keycode)
         if len(event.char) == 1: debug_string = debug_string + " - Character="+repr(event.char)
         logging.debug(debug_string)
@@ -270,8 +270,6 @@ def set_root_window(root):
     root_window.bind("<Key>", keyboard_handler)
     # Start the polling loop (for handling events passed in by other threads)
     root_window.after(100, process_external_events)
-    # Start the loop to capture and save layout state snapshots
-    capture_and_save_snapshots()
     return()
 
 #-------------------------------------------------------------------------
@@ -346,8 +344,8 @@ def shutdown_step5():
 #------------------------------------------------------------------------------------
 
 def configure_edit_mode(edit_mode:bool):
-    global editing_enabled
-    editing_enabled = edit_mode
+    global application_in_edit_mode
+    application_in_edit_mode = edit_mode
     # Configure each library module that needs to know the mode
     track_sensors.configure_edit_mode(edit_mode)
     track_sections.configure_edit_mode(edit_mode)
@@ -473,46 +471,105 @@ def execute_function_in_tkinter_thread(callback_function):
     event_queue.put(callback_function)
     return()
 
-##################################################################################################
+#-------------------------------------------------------------------------------------------------
 # Functions for configuring 'autosave' snapshots of layout state for disaster recovery purposes
 # in the event of an application freeze or crash. We only really meed to save track occupancy
 # information (as this could have changed significantly during a running session - other object
 # states are less critical (easy enough to reconfigure routes/points/signals etc)
-##################################################################################################
+#-------------------------------------------------------------------------------------------------
 
+snapshot_threadlock = threading.Lock()
 snapshot_queue = queue.Queue()
 snapshot_frequency_milliseconds = 1000
 snapshot_filename = None
+next_scheduled_snapshot = None
 
-def configure_snapshot_frequency(frequency_seconds:int):
+# Helper function to empty the queue by draining all snapshots.
+def drain_snapshot_queue():
+    while True:
+        try:
+            snapshot_queue.get_nowait()
+        except queue.Empty:
+            break
+        else:
+            snapshot_queue.task_done()
+
+#-------------------------------------------------------------------------------------------------
+# All of the following API functions are ALWAYS called from within the main Tkinter Thread
+#-------------------------------------------------------------------------------------------------
+
+def configure_layout_state_snapshot_frequency(frequency_seconds:int):
     global snapshot_frequency_milliseconds
-    if frequency_seconds <= 0:
-        logging.error("configure_layout_snapshots - snapshot frequency must be greater than zero")
-    else:
-        snapshot_frequency_milliseconds = frequency_seconds * 1000
+    # Validate the parameters as this is a library API call
+    if not isinstance(frequency_seconds, int) or frequency_seconds <= 0:
+        logging.error("StateSnapshotWriter:  - Frequency must be an int greater than zero")
+        return
+    snapshot_frequency_milliseconds = frequency_seconds * 1000
+    # Kill the current snapshot capture loop and start it again (otherwise the updated
+    # frequency won't actually take effect until the next snapshot is captured)
+    if next_scheduled_snapshot:
+        root_window.after_cancel(next_scheduled_snapshot)
+        capture_and_save_snapshots()
 
-def disable_layout_snapshots():
+def disable_layout_state_snapshots_and_cleanup():
     global snapshot_filename
-    snapshot_filename = None
+    global next_scheduled_snapshot
+    # Set the filename to None to stop further snapshots being captured / written to disk
+    # Also drain the snapshot queue to empty it (so we leave everything in a clean state)
+    # and cancel any pending Tkinter callback to stop further scheduled captures.
+    with snapshot_threadlock:
+        local_snapshot_filename = snapshot_filename
+        snapshot_filename = None
+        if next_scheduled_snapshot:
+            root_window.after_cancel(next_scheduled_snapshot)
+            next_scheduled_snapshot = None
+        drain_snapshot_queue()
+    # Delete the snapshot file (user was given the opportunity to save= the layout)
+    if local_snapshot_filename and os.path.exists(local_snapshot_filename):
+        try:
+            os.remove(local_snapshot_filename)
+        except OSError as e:
+            logging.warning(f"StateSnapshotWriter: Could not delete snapshot file")
 
-def enable_layout_snapshots(layout_filename:str):
+def enable_layout_state_snapshots(layout_filename:str):
     global snapshot_filename
-    snapshot_filename = layout_filename + ".recovery"
+    # Validate the parameters as this is a library API call
+    if not isinstance(layout_filename, str):
+        return
+    # Set the filename (this enables snapshots being captured / written to disk)
+    with snapshot_threadlock:
+        snapshot_filename = layout_filename + ".recovery-state"
+    # Start the snapshot capture loop
+    if not next_scheduled_snapshot:
+        capture_and_save_snapshots()
 
+# This function captures a snapshot of layout state information and hands it off to an
+# external thread responsible for writing the snapshot to file via a threadsafe queue.
 def capture_and_save_snapshots():
     global schematic_state_changed
+    global next_scheduled_snapshot
+    next_scheduled_snapshot = None
     try:
-        if snapshot_filename and schematic_state_changed:
+        # We only save snapshots if we are in run mode and a 'named' layout file is loaded.
+        # (i.e. if the user is still creating a layout (new_layout.sig) we don't bother)
+        # We also only save a snapshot if the state has changed since the last one.
+        with snapshot_threadlock:
+            local_snapshot_filename = snapshot_filename
+        if not application_in_edit_mode and local_snapshot_filename and schematic_state_changed:
             snapshot_data = {}
             snapshot_data["sections"] = track_sections.get_section_state_snapshot()
-            snapshot_queue.put((snapshot_filename, snapshot_data))
+            # Remove any existing (superceded) snapshots and add the current one
+            drain_snapshot_queue()
+            snapshot_queue.put(snapshot_data)
+            # The 'schematic_state_changed' flag is set to true on any occupancy change
             schematic_state_changed = False
     except Exception:
-        # Protect the polling function itself from unexpected errors
-        logging.exception("Unexpected error creating recovery snapshot")
+        # Protect the snapshot creation loop from unexpected errors
+        logging.error("StateSnapshotWriter: Unexpected error creating recovery snapshot")
     finally:
-        # Always schedule the next poll, even if a callback failed
-        root_window.after(snapshot_frequency_milliseconds, capture_and_save_snapshots)
+        # Always schedule the next snapshot even if the current snapshot failed
+        # but make sure we clear the handle before re-scheduling.
+        next_scheduled_snapshot = root_window.after(snapshot_frequency_milliseconds, capture_and_save_snapshots)
 
 #-------------------------------------------------------------------------------------------------
 # Thread to retrieve the current layout snapshot and write to file so any disk I/O delays
@@ -521,25 +578,61 @@ def capture_and_save_snapshots():
 
 def thread_to_write_layout_snapshots_to_file():
     while True:
+        # Try to retrieve a snapshot (wait for up to 10 seconds)
         try:
-            snapshot_filename, layout_state  = snapshot_queue.get(timeout=10)
+            layout_state = snapshot_queue.get(timeout=10)
         except queue.Empty:
-            pass
-        else:
-            if snapshot_filename is not None:
-                directory = os.path.dirname(snapshot_filename)
-                file_descriptor, temp_filename = tempfile.mkstemp(dir=directory)
+            continue
+        try:
+            # We only write the snapshot to file if the snapshots are still enabled
+            # (if the snapshot_filename to None then snapshots have been disabled).
+            # We hold the lock while reading the current filename so it cannot change
+            # between the time we decide to write and the time we replace the file.
+            with snapshot_threadlock:
+                local_snapshot_filename = snapshot_filename
+            if local_snapshot_filename:
+                # We have a snapshot we can save to file
+                directory = os.path.dirname(local_snapshot_filename) or "."
+                # Ensure the temp file cleanup is safe even if mkstemp() or the write fails.
+                temp_filename = None
+                file_descriptor = None
                 try:
+                    file_descriptor, temp_filename = tempfile.mkstemp(dir=directory)
+                    # To make the file write process resilliant to application crashes, the snapshot
+                    # is first written to a temp file which then replaces the current snapshot file.
                     with os.fdopen(file_descriptor, "w") as file_to_write:
                         json.dump(layout_state, file_to_write, indent=2)
                         file_to_write.flush()
                         os.fsync(file_to_write.fileno())
-                    os.replace(temp_filename, snapshot_filename)
+                    file_descriptor = None
+                    # Fixed: re-check the filename under the same lock before replacing it.
+                    # This prevents a stale write from recreating the file after snapshots
+                    # have been disabled.
+                    with snapshot_threadlock:
+                        if snapshot_filename == local_snapshot_filename:
+                            os.replace(temp_filename, local_snapshot_filename)
+                            temp_filename = None
                 except OSError as error:
-                    print(f"SnapshotWriter: failed to write {self.filename}: {error}")
+                    logging.error(f"StateSnapshotWriter: failed to write {local_snapshot_filename}: {error}")
+                except Exception as error:
+                    logging.error(f"StateSnapshotWriter: Unexpected error writing {local_snapshot_filename}: {error}")
                 finally:
-                    if os.path.exists(temp_filename):
-                        os.remove(temp_filename)
+                    # Even if the write process errored, we still try to clean up the temp file
+                    if file_descriptor is not None:
+                        try:
+                            os.close(file_descriptor)
+                        except OSError as e:
+                            logging.warning(f"StateSnapshotWriter: Could not close temp snapshot file: {e}")
+                    if temp_filename and os.path.exists(temp_filename):
+                        try:
+                            os.remove(temp_filename)
+                        except OSError as e:
+                            logging.warning(f"StateSnapshotWriter: Could not delete temp snapshot file: {e}")
+            # If snapshots are disabled, drop the queued item without writing anything.
+            # This is safe because we already captured the object and we are not re-queueing it.
+        finally:
+            # task_done() is only called after a successful get() operation.
+            snapshot_queue.task_done()
 
 # Start the layout snapshot writing thread
 threading.Thread(target=thread_to_write_layout_snapshots_to_file, daemon=True).start()
